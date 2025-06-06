@@ -61,7 +61,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#e4f5ed",
     elevation: 1,
-    lineHeight: 18,
+    shadowColor: "#000",
+    width: "96%",
+    marginHorizontal: "auto",
   },
 
   prayerPointHeading: {
@@ -80,11 +82,10 @@ const styles = StyleSheet.create({
   },
   box: {
     width: "48%",
-    //     backgroundColor: "#14314f",
+    backgroundColor: "#1e2572",
     marginBottom: 10,
-    padding: 16,
-    borderRadius: 8,
-    backgroundColor: "#ffffff",
+    padding: 10,
+    borderRadius: 10,
   },
   textInstruction: {
     //     color: "#fff",
@@ -95,9 +96,9 @@ const styles = StyleSheet.create({
   },
 
   text: {
-    color: "#000",
+    color: "#fff",
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: "bold",
     textAlign: "center",
   },
 

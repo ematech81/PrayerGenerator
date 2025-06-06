@@ -9,8 +9,8 @@ const DailyBibleReading = () => {
         {/* <View> */}
         <View
           style={{
-            width: 6,
-            height: 6,
+            width: 10,
+            height: 10,
             backgroundColor: "#3edc65",
             borderRadius: 2,
             marginRight: 6,
@@ -19,9 +19,9 @@ const DailyBibleReading = () => {
         ></View>
         <Text
           style={{
-            fontSize: 18,
+            fontSize: 22,
             fontWeight: "bold",
-            color: "#000",
+            color: "#ffffff",
             marginBottom: 6,
           }}
         >
@@ -42,7 +42,7 @@ const DailyBibleReading = () => {
         </View>
         {/* read all */}
         <View style={styles.readAllContainer}>
-          <Text style={{ color: "#fff", fontSize: 11, paddingRight: 10 }}>
+          <Text style={{ color: "#fff", fontSize: 14, paddingRight: 10 }}>
             Read all
           </Text>
           <AntDesign name="right" size={20} color="white" strokeWidth="2" />
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     height: 150,
-    backgroundColor: "#ffffff",
+    // backgroundColor: "#fff",
     elevation: 1,
   },
   cont: {

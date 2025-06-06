@@ -1,9 +1,30 @@
-export const DummyPrayer = [
+const DummyPrayer = [
   {
     _id: "665f15000000000000000001",
     topic: "Hunger for God",
     category: "Spiritual Growth & Faith",
-    prayers: [],
+    prayers: [
+      {
+        text: "Lord, create in me an unquenchable hunger and thirst for Your presence. Let my desire for You surpass all worldly pleasures, as Your word says in Psalm 42:1, that my soul should long for You like the deer pants for water.",
+        verseRef: "Psalm 42:1",
+      },
+      {
+        text: "Father, stir my heart daily to seek You in prayer, worship, and the Word. According to Matthew 6:33, help me to seek first Your Kingdom and righteousness, knowing that all other things will be added.",
+        verseRef: "Matthew 6:33",
+      },
+      {
+        text: "Holy Spirit, break every spirit of complacency in me. Ignite a fresh fire for the things of God, for Romans 12:11 instructs us to never be lacking in zeal but to keep our spiritual fervor, serving the Lord.",
+        verseRef: "Romans 12:11",
+      },
+      {
+        text: "Lord Jesus, I want to grow in intimacy with You every day. According to Philippians 3:10, let it be my lifelong pursuit to know You and the power of Your resurrection.",
+        verseRef: "Philippians 3:10",
+      },
+      {
+        text: "Father, let the hunger for righteousness increase in me daily. According to Your word in Matthew 5:6, those who hunger and thirst for righteousness shall be filled.",
+        verseRef: "Matthew 5:6",
+      },
+    ],
   },
   {
     _id: "665f15000000000000000002",
@@ -1003,3 +1024,5 @@ export const DummyPrayer = [
     ],
   },
 ];
+
+export default DummyPrayer;

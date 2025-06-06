@@ -1,14 +1,16 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StatusBar, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Navigation from "../component/Navigation";
 import DailyVerse from "../component/DailyVerse";
 import DailyBibleReading from "../component/DailyBibleReading";
 import PrayerPoint from "../component/PrayerPoint";
 import Affirmation from "../component/Affirmation";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const HomeScreen = () => {
   return (
     <View style={styles.screen}>
+      <StatusBar barStyle="light-content" backgroundColor="#071738" />
       <Navigation /> {/* Fixed at the top */}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -36,15 +38,16 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#f8f8fa",
+    backgroundColor: "#071738",
+    // backgroundColor: "#f8f8fa",
   },
   scrollContent: {
     paddingHorizontal: 4,
-    paddingBottom: 20,
+    paddingBottom: 100,
   },
   divider: {
     height: 1,
-    backgroundColor: "#FF5722",
+    backgroundColor: "#ff008c",
     marginVertical: 3,
     width: "90%",
     alignSelf: "center",
@@ -60,7 +63,7 @@ const styles = StyleSheet.create({
   roundedContainer: {
     borderRadius: 10,
     overflow: "hidden",
-    backgroundColor: "#FF5722",
+    backgroundColor: "#ff008c",
     height: 15,
     width: 15,
   },

@@ -4,6 +4,7 @@ import BottomTabs from "./src/navigation/BottomTabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PrayerPointScreen from "./src/screens/PrayerPointScreen";
+import GeneratedScreen from "./src/screens/GeneratedScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ export default function App() {
         <Stack.Screen name="MainTabs" component={BottomTabs} />
 
         <Stack.Screen name="PrayerPointScreen" component={PrayerPointScreen} />
+        <Stack.Screen name="GeneratedScreen" component={GeneratedScreen} />
       </Stack.Navigator>
     </NavigationContainer>
     // <SafeAreaView style={styles.safeArea}>

@@ -12,8 +12,8 @@ const PrayerPoint = () => {
           {/* <View> */}
           <View
             style={{
-              width: 8,
-              height: 8,
+              width: 10,
+              height: 10,
               backgroundColor: "#3edc65",
               borderRadius: 2,
               marginRight: 6,
@@ -24,8 +24,8 @@ const PrayerPoint = () => {
         </View>
 
         <View style={{}}>
-          <Pressable onPress={() => Navigation.navigate("PrayerPointScreen")}>
-            <Text style={{ color: "#000", fontSize: 11, paddingRight: 10 }}>
+          <Pressable onPress={() => Navigation.navigate("Prayer")}>
+            <Text style={{ color: "#fff", fontSize: 14, paddingRight: 10 }}>
               See all
             </Text>
           </Pressable>
@@ -64,13 +64,18 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     padding: 10,
-    backgroundColor: "#dbea",
+    // backgroundColor: "#1e2572",
+    backgroundColor: "#321033",
+    // backgroundColor: "#dbea",
+    width: "96%",
+    // shadowColor: "#000",
+    marginHorizontal: "auto",
   },
 
   prayerPointHeading: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: "bold",
-    color: "#000",
+    color: "#ffffff",
     marginBottom: 6,
   },
   scrollContainer: {
@@ -89,9 +94,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   textInstruction: {
-    //     color: "#fff",
+    color: "#fff",
     fontSize: 14,
-    //     fontWeight: "bold",
+    fontWeight: "bold",
     marginLeft: 10,
     lineHeight: 22,
   },
