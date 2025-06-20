@@ -66,39 +66,40 @@ const PrayerScreen = () => {
     </TouchableOpacity>
   );
 
-  const renderTopicItem = ({ item }) => (
-    <View style={[styles.topicItem, isDark && { backgroundColor: "#333" }]}>
-      <Text style={[styles.topicText, isDark && { color: "#fff" }]}>
-        {item.topic}
-      </Text>
-      <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity
-          style={styles.goButton}
-          onPress={() =>
-            navigation.navigate("GeneratedScreen", { topic: item })
-          }
-        >
-          <Text style={styles.goButtonText}>Go</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.favoriteBtn}
-          onPress={() => handleFavorite(item._id)}
-        >
-          {/* <Text
-            style={{ color: favorites.includes(item._id) ? "red" : "gray" }}
-          >
-            ♥
-          </Text> */}
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const renderTopicItem = ({ item, index }) => {
+    const backgroundColor = topicColors[index % topicColors.length]; // Cycle through colors
+    return (
+      <TouchableOpacity
+        style={[
+          styles.topicItem,
+          { backgroundColor },
+          isDark && { backgroundColor: "#333" }, // override if dark mode
+        ]}
+        onPress={() => navigation.navigate("GeneratedScreen", { topic: item })}
+      >
+        <Text style={[styles.topicText, isDark && { color: "#fff" }]}>
+          {item.topic}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const topicColors = [
+    "#1e2572",
+    "#321033",
+    "#004d40",
+    "#5d1049",
+    "#3e2723",
+    "#1565c0",
+    "#4527a0",
+    "#004d40",
+  ];
 
   const navigation = useNavigation();
 
   return (
     <View style={[styles.container, isDark && { backgroundColor: "#000" }]}>
-      <StatusBar barStyle="light-content" backgroundColor="#071738" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <TouchableOpacity
         style={styles.arrowBack}
         onPress={() => navigation.goBack()}
@@ -114,7 +115,7 @@ const PrayerScreen = () => {
         placeholderTextColor={isDark ? "#888" : "#666"}
         style={[
           styles.searchBar,
-          isDark && { backgroundColor: "#222", color: "#fff" },
+          isDark && { backgroundColor: "#f3f3f3", color: "#f3f3f3" },
         ]}
         value={searchQuery}
         onChangeText={setSearchQuery}
@@ -122,6 +123,7 @@ const PrayerScreen = () => {
       <View style={styles.categSubHeading}>
         <Text style={styles.categSubHeadingText}>Select Category</Text>
       </View>
+
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -135,6 +137,9 @@ const PrayerScreen = () => {
         keyExtractor={(item) => item._id}
         renderItem={renderTopicItem}
         contentContainerStyle={styles.topicList}
+        numColumns={2} // TWO ITEMS PER ROW
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        showsVerticalScrollIndicator={false}
       />
 
       {/* MODAL for Selected Prayer */}
@@ -180,18 +185,18 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 16,
     paddingTop: 50,
-    backgroundColor: "#071738",
+    backgroundColor: "#ffffff",
+    // backgroundColor: "#071738",
     paddingBottom: 50,
   },
   arrowBack: {
-    padding: 10,
     marginBottom: 16,
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 12,
-    color: "#ffffff",
+    color: "#000000",
     fontWeight: "bold",
   },
   searchBar: {
@@ -202,7 +207,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginBottom: 12,
     backgroundColor: "#f1f1f1",
-    elevation: 3,
+    // elevation: 3,
   },
 
   categoryList: {
@@ -212,58 +217,49 @@ const styles = StyleSheet.create({
     height: 100, // Increased height for better visibility
   },
   categSubHeading: {
-    marginVertical: 10,
+    marginVertical: 8,
     padding: 10,
     justifyContent: "flex-start",
     width: "100%",
     // backgroundColor: "red",
   },
   categSubHeadingText: {
-    fontSize: 18,
-    lineHeight: 22,
-    fontWeight: "500",
-    color: "#fff",
+    fontSize: 22,
+    lineHeight: 30,
+    fontWeight: "bold",
+    color: "#1e2572",
   },
   categoryItem: {
-    paddingVertical: 10, // Increased for touch-friendly size
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: "#2e2e2e",
+    paddingVertical: 1, // Increased for touch-friendly size
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    backgroundColor: "#eee",
     marginRight: 10,
     alignItems: "center",
     justifyContent: "center",
+    maxHeight: 50,
   },
   selectedCategory: {
-    backgroundColor: "#1e2572",
+    color: "#1e2572",
   },
   categoryText: {
-    fontSize: 15,
-    color: "#ccc",
+    color: "#1e2572",
     fontWeight: "bold",
+    fontSize: 14,
   },
   selectedCategoryText: {
-    color: "#fff",
+    color: "#ff008c",
     fontWeight: "bold",
-    fontSize: 16,
+    fontSize: 14,
   },
   topicList: {
     paddingBottom: 16,
   },
-  topicItem: {
-    padding: 12,
-    backgroundColor: "#321033",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    marginBottom: 10,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
+
   topicText: {
-    fontSize: 16,
+    fontSize: 14,
     flex: 1,
-    color: "#ccc",
+    color: "#fff",
     fontWeight: "bold",
   },
   goButton: {
@@ -315,6 +311,29 @@ const styles = StyleSheet.create({
     backgroundColor: "#4A90E2",
     padding: 10,
     borderRadius: 8,
+  },
+  row: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  },
+  box: {
+    width: "48%",
+    backgroundColor: "#1e2572",
+    marginBottom: 10,
+    padding: 10,
+    borderRadius: 10,
+  },
+  topicItem: {
+    flex: 1,
+    margin: 5,
+    padding: 12,
+    borderRadius: 10,
+    minHeight: 80,
+    justifyContent: "center",
+    alignItems: "center",
+    width: "48%",
+    flexWrap: "wrap",
   },
 });
 

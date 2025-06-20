@@ -10,7 +10,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 const HomeScreen = () => {
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="light-content" backgroundColor="#071738" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <Navigation /> {/* Fixed at the top */}
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -38,8 +38,8 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#071738",
-    // backgroundColor: "#f8f8fa",
+    // backgroundColor: "#071738",
+    backgroundColor: "#f8f8fa",
   },
   scrollContent: {
     paddingHorizontal: 4,

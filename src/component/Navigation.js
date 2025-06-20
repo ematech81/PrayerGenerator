@@ -7,15 +7,15 @@ import Entypo from "@expo/vector-icons/Entypo";
 const Navigation = () => {
   return (
     <View style={styles.navbar}>
-      <AntDesign name="user" size={20} color="white" strokeWidth="10" />
+      <AntDesign name="user" size={26} color="black" strokeWidth="10" />
       <View style={styles.menu}>
         <Ionicons
           name="notifications-circle"
           size={20}
-          color="white"
+          color="black"
           strokeWidth="10"
         />
-        <Entypo name="menu" size={30} color="#ccc" strokeWidth="10" />
+        <Entypo name="menu" size={30} color="black" strokeWidth="10" />
       </View>
     </View>
   );
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    // backgroundColor: '#fff',
+    backgroundColor: "#ffffff",
     height: 50,
     paddingTop: 4,
     width: "100%",

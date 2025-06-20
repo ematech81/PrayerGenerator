@@ -21,7 +21,7 @@ const DailyBibleReading = () => {
           style={{
             fontSize: 22,
             fontWeight: "bold",
-            color: "#ffffff",
+            color: "##14314f",
             marginBottom: 6,
           }}
         >
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     padding: 10,
     height: 150,
     // backgroundColor: "#fff",
-    elevation: 1,
+    // elevation: 1,
   },
   cont: {
     flexDirection: "row",

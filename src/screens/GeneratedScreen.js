@@ -46,14 +46,17 @@ const GeneratedScreen = ({ route }) => {
               <Text style={styles.verseRef}>Verse Refrence</Text>
               <Text style={styles.verse}>{item.verseRef}</Text>
             </View>
-            <TouchableOpacity style={styles.startPrayer}>
-              <Text>Start Prayer</Text>
-            </TouchableOpacity>
           </View>
         )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
       />
+      <TouchableOpacity
+        style={styles.startPrayer}
+        onPress={() => navigation.navigate("HowToPrayScreen", { topic: topic })}
+      >
+        <Text>Learn How to Pray</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -73,9 +76,11 @@ const styles = StyleSheet.create({
   },
   prayerItem: {
     marginBottom: 16,
-    backgroundColor: "#1e2572",
+    // backgroundColor: "#1e2572",
     padding: 16,
     borderRadius: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ff008c",
   },
   prayerText: {
     color: "#ccc",

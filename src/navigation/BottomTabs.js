@@ -43,6 +43,7 @@ import BibleScreen from "../screens/BibleScreen";
 import PrayerScreen from "../screens/PrayerScreen";
 import AffirmationScreen from "../screens/AffirmationScreen";
 import HomeScreen from "../screens/HomeScreen";
+import GospelSongSearchScreen from "../screens/GospelSongSearch";
 
 const Tab = createBottomTabNavigator();
 
@@ -55,7 +56,7 @@ export default function BottomTabs() {
           if (route.name === "Home") iconName = "home";
           else if (route.name === "Bible") iconName = "book";
           else if (route.name === "Prayer") iconName = "rose-outline";
-          else if (route.name === "Affirmation") iconName = "sparkles-outline";
+          else if (route.name === "Songs") iconName = "sparkles-outline";
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -80,7 +81,7 @@ export default function BottomTabs() {
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Bible" component={BibleScreen} />
       <Tab.Screen name="Prayer" component={PrayerScreen} />
-      <Tab.Screen name="Affirmation" component={AffirmationScreen} />
+      <Tab.Screen name="Songs" component={GospelSongSearchScreen} />
     </Tab.Navigator>
   );
 }
