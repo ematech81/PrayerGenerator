@@ -6,7 +6,7 @@ export const LANGUAGES = {
   },
   ig: {
     name: "Igbo",
-    bibleId: "5f1c3a1f1798f67b-01",
+    bibleId: "a36fc06b086699f1-02",
     api: "apiBible",
     direction: "ltr",
   },

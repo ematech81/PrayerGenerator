@@ -1,0 +1,76 @@
+// utils/storage.js
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// Favorites functions
+export const getFavorites = async () => {
+  try {
+    const favorites = await AsyncStorage.getItem("favorites");
+    return favorites ? JSON.parse(favorites) : [];
+  } catch (error) {
+    console.error("Error getting favorites:", error);
+    return [];
+  }
+};
+
+export const addToFavorites = async (videoId) => {
+  try {
+    const favorites = await getFavorites();
+    if (!favorites.includes(videoId)) {
+      favorites.push(videoId);
+      await AsyncStorage.setItem("favorites", JSON.stringify(favorites));
+    }
+    return favorites;
+  } catch (error) {
+    console.error("Error adding to favorites:", error);
+    throw error;
+  }
+};
+
+export const removeFromFavorites = async (videoId) => {
+  try {
+    const favorites = await getFavorites();
+    const updatedFavorites = favorites.filter((id) => id !== videoId);
+    await AsyncStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    return updatedFavorites;
+  } catch (error) {
+    console.error("Error removing from favorites:", error);
+    throw error;
+  }
+};
+
+// Playlist functions
+export const getPlaylist = async () => {
+  try {
+    const playlist = await AsyncStorage.getItem("playlist");
+    return playlist ? JSON.parse(playlist) : [];
+  } catch (error) {
+    console.error("Error getting playlist:", error);
+    return [];
+  }
+};
+
+export const addToPlaylist = async (videoId) => {
+  try {
+    const playlist = await getPlaylist();
+    if (!playlist.includes(videoId)) {
+      playlist.push(videoId);
+      await AsyncStorage.setItem("playlist", JSON.stringify(playlist));
+    }
+    return playlist;
+  } catch (error) {
+    console.error("Error adding to playlist:", error);
+    throw error;
+  }
+};
+
+export const removeFromPlaylist = async (videoId) => {
+  try {
+    const playlist = await getPlaylist();
+    const updatedPlaylist = playlist.filter((id) => id !== videoId);
+    await AsyncStorage.setItem("playlist", JSON.stringify(updatedPlaylist));
+    return updatedPlaylist;
+  } catch (error) {
+    console.error("Error removing from playlist:", error);
+    throw error;
+  }
+};

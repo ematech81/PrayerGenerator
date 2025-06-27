@@ -1,207 +1,177 @@
-// GospelSongSearchScreen.js
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   View,
-  Text,
   TextInput,
   FlatList,
-  Image,
   TouchableOpacity,
-  StyleSheet,
+  Text,
   ActivityIndicator,
-  Modal,
-  Dimensions,
+  StyleSheet,
 } from "react-native";
-// import { WebView } from "react-native-webview";
-import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-const { height } = Dimensions.get("window");
-const Tab = createMaterialTopTabNavigator();
-const YOUTUBE_API_KEY = "AIzaSyAbN4WRfOcz4TvTDq2AXvyTa2YDdnIsX2U";
+import { fetchDefaultSongs, searchSongs } from "../utils/apiService";
+import { BibleContext } from "../contex/BibleContext";
+import SongItem from "../component/SongItem";
 
-const SongPlayerModal = ({ visible, onClose, videoId, title }) => {
-  return (
-    <Modal visible={visible} animationType="slide">
-      <View style={{ flex: 1, backgroundColor: "#fff" }}>
-        <Text style={styles.modalTitle}>{title}</Text>
-        <webview
-          style={{ flex: 1 }}
-          javaScriptEnabled
-          source={{ uri: `https://www.youtube.com/embed/${videoId}` }}
-        />
-        <View style={styles.modalActions}>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Text style={styles.actionText}>➕ Add to Favorites</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.actionBtn}>
-            <Text style={styles.actionText}>📁 Add to Playlist</Text>
-          </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.closeModal} onPress={onClose}>
-          <Text style={{ fontSize: 16, fontWeight: "bold" }}>Close</Text>
-        </TouchableOpacity>
-      </View>
-    </Modal>
-  );
-};
-
-const SongsTab = () => {
-  const [query, setQuery] = useState("");
+const SongScreen = () => {
+  const [activeTab, setActiveTab] = useState("songs");
+  const [searchQuery, setSearchQuery] = useState("");
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedSong, setSelectedSong] = useState(null);
+  const [error, setError] = useState(null);
+  const { currentVideoId, isPlaying } = useContext(BibleContext);
 
-  const searchSongs = async () => {
-    if (!query) return;
-    setLoading(true);
+  // Fetch songs with error handling
+  const fetchSongs = async (fetchFunction) => {
     try {
-      const response = await fetch(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=50&q=${query}+gospel&type=video&key=${YOUTUBE_API_KEY}`
-      );
-      const data = await response.json();
-      setSongs(data.items);
-    } catch (error) {
-      console.error("Error fetching songs:", error);
+      setLoading(true);
+      setError(null);
+      const data = await fetchFunction();
+      setSongs(data);
+    } catch (err) {
+      setError("Failed to load songs. Please try again.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  const openModal = (song) => {
-    setSelectedSong(song);
-    setModalVisible(true);
+  // Fetch default songs on load
+  useEffect(() => {
+    fetchSongs(fetchDefaultSongs);
+  }, []);
+
+  // Search songs (debounced)
+  useEffect(() => {
+    if (searchQuery.trim() === "") {
+      fetchSongs(fetchDefaultSongs);
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      fetchSongs(() => searchSongs(searchQuery));
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Filter songs based on tab
+  const getFilteredSongs = () => {
+    if (activeTab === "playlist") {
+      return songs.filter((song) => playlist.includes(song.id.videoId));
+    }
+    if (activeTab === "favorites") {
+      return songs.filter((song) => favorites.includes(song.id.videoId));
+    }
+    return songs;
   };
 
-  const renderItem = ({ item }) => {
-    const videoId = item.id.videoId;
-    const { title, thumbnails, channelTitle } = item.snippet;
-
+  if (error) {
     return (
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => openModal({ videoId, title })}
-      >
-        <Image
-          source={{ uri: thumbnails.medium.url }}
-          style={styles.thumbnail}
-        />
-        <View style={{ flex: 1 }}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.channel}>{channelTitle}</Text>
-        </View>
-      </TouchableOpacity>
+      <View style={styles.centerContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity onPress={() => fetchSongs(fetchDefaultSongs)}>
+          <Text style={styles.retryText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
     );
-  };
+  }
+
+  if (loading && songs.length === 0) {
+    return (
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
+      {/* Search Bar */}
       <TextInput
-        placeholder="Search gospel song..."
-        value={query}
-        onChangeText={setQuery}
-        onSubmitEditing={searchSongs}
-        style={styles.input}
+        placeholder="Search gospel songs..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        style={styles.searchBar}
       />
 
-      {loading ? (
-        <ActivityIndicator size="large" color="#4A90E2" />
-      ) : (
-        <FlatList
-          data={songs}
-          keyExtractor={(item) => item.id.videoId}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-        />
-      )}
+      {/* Tabs */}
+      <View style={styles.tabBar}>
+        <TouchableOpacity onPress={() => setActiveTab("songs")}>
+          <Text style={activeTab === "songs" ? styles.activeTab : styles.tab}>
+            Songs
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setActiveTab("playlist")}>
+          <Text
+            style={activeTab === "playlist" ? styles.activeTab : styles.tab}
+          >
+            Playlist
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setActiveTab("favorites")}>
+          <Text
+            style={activeTab === "favorites" ? styles.activeTab : styles.tab}
+          >
+            Favorites
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-      {selectedSong && (
-        <SongPlayerModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          videoId={selectedSong.videoId}
-          title={selectedSong.title}
-        />
-      )}
+      {/* Song List */}
+      <FlatList
+        data={getFilteredSongs()}
+        keyExtractor={(item) => item.id.videoId}
+        extraData={[currentVideoId, isPlaying, activeTab]}
+        renderItem={({ item }) => <SongItem video={item} />}
+        ListEmptyComponent={
+          <View style={styles.centerContainer}>
+            <Text>No songs found</Text>
+          </View>
+        }
+      />
     </View>
   );
 };
 
-const PlaylistTab = () => (
-  <View style={styles.tabPlaceholder}>
-    <Text>All your playlist will appear here.</Text>
-  </View>
-);
-
-const RecentlyPlayedTab = () => (
-  <View style={styles.tabPlaceholder}>
-    <Text>Recently played songs will appear here.</Text>
-  </View>
-);
-const FavoritesTab = () => (
-  <View style={styles.tabPlaceholder}>
-    <Text>Favorite songs will appear here.</Text>
-  </View>
-);
-
-const GospelSongSearchScreen = () => {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Songs" component={SongsTab} />
-      <Tab.Screen name="Playlist" component={PlaylistTab} />
-      <Tab.Screen name="Recent" component={RecentlyPlayedTab} />
-      <Tab.Screen name="Favorites" component={FavoritesTab} />
-    </Tab.Navigator>
-  );
-};
-
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, backgroundColor: "#1e2572" },
-  input: {
+  container: {
+    flex: 1,
+    padding: 10,
+  },
+  searchBar: {
+    padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 10,
-    padding: 10,
-    marginBottom: 15,
+    borderRadius: 5,
+    marginBottom: 10,
   },
-  list: { paddingBottom: 20 },
-  card: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-    backgroundColor: "#f9f9f9",
-    padding: 10,
-    borderRadius: 8,
-  },
-  thumbnail: { width: 100, height: 60, borderRadius: 6, marginRight: 10 },
-  title: { fontSize: 14, fontWeight: "bold" },
-  channel: { fontSize: 12, color: "#666" },
-  modalTitle: { fontSize: 18, fontWeight: "bold", margin: 16 },
-  modalActions: {
+  tabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    paddingVertical: 12,
-    backgroundColor: "#f0f0f0",
+    marginBottom: 10,
   },
-  actionBtn: {
+  tab: {
     padding: 10,
-    backgroundColor: "#4A90E2",
-    borderRadius: 8,
+    color: "#666",
   },
-  actionText: { color: "#fff", fontWeight: "bold" },
-  closeModal: {
-    alignItems: "center",
+  activeTab: {
     padding: 10,
-    backgroundColor: "#eee",
-    borderTopWidth: 1,
-    borderColor: "#ccc",
+    color: "#6200ee",
+    fontWeight: "bold",
   },
-  tabPlaceholder: {
+  centerContainer: {
     flex: 1,
-    alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#fff",
-    // marginTop: 100,
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    marginBottom: 10,
+  },
+  retryText: {
+    color: "#6200ee",
   },
 });
 
-export default GospelSongSearchScreen;
+export default SongScreen;

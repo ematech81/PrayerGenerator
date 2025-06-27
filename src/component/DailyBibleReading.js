@@ -1,54 +1,65 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { useNavigation } from "@react-navigation/native";
 
 const DailyBibleReading = () => {
-  return (
-    <View style={styles.bibleReadingContainer}>
-      <View style={styles.readingHeading}>
-        {/* <View> */}
-        <View
-          style={{
-            width: 10,
-            height: 10,
-            backgroundColor: "#3edc65",
-            borderRadius: 2,
-            marginRight: 6,
-            borderRadius: 100,
-          }}
-        ></View>
-        <Text
-          style={{
-            fontSize: 22,
-            fontWeight: "bold",
-            color: "##14314f",
-            marginBottom: 6,
-          }}
-        >
-          Daily Reading
-        </Text>
+  const Navigation = useNavigation();
 
-        {/* </View> */}
-      </View>
-      <View style={styles.scriptreContainer}>
-        <View style={styles.cont}>
-          <View style={styles.roundView}></View>
-          <View style={{ flex: 1, marginLeft: 10 }}>
-            <Text style={{ color: "#fff", fontSize: 16, fontWeight: "bold" }}>
-              Dialy Scripture
+  return (
+    <>
+      <TouchableOpacity
+        onPress={() => Navigation.navigate("DailyReadingScreen")}
+      >
+        <View style={styles.bibleReadingContainer}>
+          <View style={styles.readingHeading}>
+            {/* <View> */}
+            <View
+              style={{
+                width: 10,
+                height: 10,
+                backgroundColor: "#3edc65",
+                borderRadius: 2,
+                marginRight: 6,
+                borderRadius: 100,
+              }}
+            ></View>
+            <Text
+              style={{
+                fontSize: 22,
+                fontWeight: "bold",
+                color: "##14314f",
+                marginBottom: 6,
+              }}
+            >
+              Daily Reading
             </Text>
-            <Text style={{ color: "#fff", fontSize: 13 }}>Psalm 23:1</Text>
+
+            {/* </View> */}
+          </View>
+          <View style={styles.scriptreContainer}>
+            <View style={styles.cont}>
+              <View style={styles.roundView}></View>
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <Text
+                  style={{ color: "#fff", fontSize: 16, fontWeight: "bold" }}
+                >
+                  Dialy Scripture
+                </Text>
+                <Text style={{ color: "#fff", fontSize: 13 }}>Psalm 23:1</Text>
+              </View>
+            </View>
+            {/* read all */}
+            <View style={styles.readAllContainer}>
+              <Text style={{ color: "#fff", fontSize: 14, paddingRight: 10 }}>
+                Read all
+              </Text>
+              <AntDesign name="right" size={20} color="white" strokeWidth="2" />
+            </View>
           </View>
         </View>
-        {/* read all */}
-        <View style={styles.readAllContainer}>
-          <Text style={{ color: "#fff", fontSize: 14, paddingRight: 10 }}>
-            Read all
-          </Text>
-          <AntDesign name="right" size={20} color="white" strokeWidth="2" />
-        </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </>
   );
 };
 

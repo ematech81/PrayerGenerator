@@ -55,7 +55,7 @@ const GeneratedScreen = ({ route }) => {
         style={styles.startPrayer}
         onPress={() => navigation.navigate("HowToPrayScreen", { topic: topic })}
       >
-        <Text>Learn How to Pray</Text>
+        <Text>Guided Prayer</Text>
       </TouchableOpacity>
     </View>
   );
@@ -121,6 +121,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 10,
     width: "100%",
+    marginBottom: 20,
   },
 });
 

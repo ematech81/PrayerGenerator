@@ -28,7 +28,7 @@ const TranslationSelector = ({
         onPress={() => setShowList(true)}
       >
         <Text style={styles.selectorText}>
-          {currentTranslation.abbreviation || "ASV"}
+          {currentTranslation?.abbreviation?.toUpperCase() || "ASV"}
         </Text>
       </TouchableOpacity>
 
@@ -71,7 +71,7 @@ export default TranslationSelector;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    backgroundColor: "rgba(255,255,255,0.2)",
+    // backgroundColor: "rgba(255,255,255,0.2)",
     paddingHorizontal: 16,
     borderRadius: 15,
     marginRight: 10,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   selector: {
     padding: 8,
     borderRadius: 6,
-    //     backgroundColor: "#e",
+    // backgroundColor: "red",
   },
   selectorText: {
     fontSize: 16,
@@ -87,16 +87,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   modalBackdrop: {
-    flex: 1,
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
     padding: 20,
   },
   modalContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    maxHeight: "70%",
+    Height: 200,
   },
   modalTitle: {
     fontSize: 18,

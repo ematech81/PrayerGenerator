@@ -1,6 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LANGUAGES } from "../constant/BibleTranslations";
+import GeneratedScreen from "../screens/GeneratedScreen";
 // https://cors-anywhere.herokuapp.com/
 // Base API configuration
 const bibleApi = axios.create({
@@ -154,24 +155,46 @@ export const fetchBookById = async (bookId) => {
  * @param {number} chapterId
  * @returns {Promise<Object>} Chapter details
  */
-export const fetchChapter = async (bookId, chapterId) => {
+
+// function to fetch chapters
+export const fetchChapter = async (
+  bookId,
+  chapterId,
+  currentLanguage = "en"
+) => {
+  const selectedLang = LANGUAGES[currentLanguage];
+
   try {
+    // ✅ For Local Language using API.Bible
+    if (selectedLang?.api === "apiBible") {
+      const passageId = `${bookId}.${chapterId}`;
+      const verses = await fetchVersesFromApiBible(
+        selectedLang.bibleId,
+        passageId
+      );
+
+      return {
+        id: `${bookId}-${chapterId}`,
+        book: { id: bookId, name: bookId, testament: "OT" }, // You can improve this with actual name if needed
+        chapterId,
+        verses: [verses], // maintain array-of-array format for compatibility
+      };
+    }
+
+    // ✅ For English (default)
     const response = await bibleApi.get(
       `/books/${bookId}/chapters/${chapterId}`
     );
 
-    // Transform the API response to match our expected structure
-    const chapterData = {
+    return {
       id: response.data.id,
       book: response.data.book,
       chapterId: response.data.chapterId,
-      verses: response.data.verses || [response.data], // Handle single verse or multiple verses
+      verses: response.data.verses || [response.data],
     };
-
-    return chapterData;
   } catch (error) {
     console.error(
-      `Error fetching chapter ${chapterId} of book ${bookId}:`,
+      `❌ Error fetching chapter ${chapterId} of book ${bookId}:`,
       error
     );
     throw error;
@@ -219,12 +242,6 @@ export const fetchAllTranslations = async () => {
       }
     );
 
-    console.log("[DEBUG] Translation API Response:", {
-      status: response.status,
-      data: response.data,
-      headers: response.headers,
-    });
-
     if (!response.data) {
       throw new Error("Empty response received");
     }
@@ -234,13 +251,74 @@ export const fetchAllTranslations = async () => {
     console.error("[ERROR] Failed to fetch translations:", {
       error: error.message,
       code: error.code,
-      config: {
-        url: error.config?.url,
-        method: error.config?.method,
-      },
+      // config: {
+      //   url: error.config?.url,
+      //   method: error.config?.method,
+      // },
       response: error.response?.data,
     });
     throw error;
+  }
+};
+
+// ✅ For local languages: Yoruba, Igbo, Hausa
+export const fetchVersesFromApiBible = async (bibleId, passageId) => {
+  try {
+    const response = await apiBible.get(
+      `/bibles/${bibleId}/passages/${passageId}`,
+      {
+        params: {
+          "content-type": "json",
+          "include-chapter-numbers": true,
+          "include-verse-numbers": true,
+        },
+      }
+    );
+
+    const content = response.data.data?.content || [];
+
+    const formattedVerses = [];
+    let currentVerseId = null;
+    let currentText = "";
+
+    for (const block of content) {
+      if (block.name === "para" && Array.isArray(block.items)) {
+        for (const item of block.items) {
+          if (item.name === "verse" && item.attrs?.number) {
+            // Push previous verse before starting new one
+            if (currentVerseId && currentText.trim()) {
+              formattedVerses.push({
+                id: String(currentVerseId),
+                verseId: String(currentVerseId),
+                verseNumber: String(currentVerseId),
+                text: currentText.replace(/\s+/g, " ").trim(),
+              });
+              currentText = "";
+            }
+            currentVerseId = item.attrs.number;
+          }
+
+          if (item.type === "text" && item.text) {
+            currentText += item.text + " ";
+          }
+        }
+      }
+    }
+
+    // Push last verse
+    if (currentVerseId && currentText.trim()) {
+      formattedVerses.push({
+        id: String(currentVerseId),
+        verseId: String(currentVerseId),
+        verseNumber: String(currentVerseId),
+        text: currentText.replace(/\s+/g, " ").trim(),
+      });
+    }
+
+    return formattedVerses;
+  } catch (error) {
+    console.error("❌ Failed to fetch local language verses:", error);
+    return [];
   }
 };
 
@@ -249,13 +327,31 @@ export const fetchVersesForTranslation = async (
   bookId,
   chapter
 ) => {
-  try {
-    console.log("🔍 Fetching with:", {
-      translation: translationCode,
-      bookId,
-      chapter,
-    });
+  const selectedLang = LANGUAGES[translationCode];
 
+  // ✅ Local Language API logic
+  if (selectedLang?.api === "apiBible") {
+    const passageId = `${bookId}.${chapter}`; // e.g. GEN.1
+
+    try {
+      const verses = await fetchVersesFromApiBible(
+        selectedLang.bibleId,
+        passageId
+      );
+      console.log(
+        "✅ Local language verses fetched:",
+        verses?.length,
+        verses?.slice(0, 3)
+      );
+      return verses;
+    } catch (err) {
+      console.error("❌ Error fetching local language verses:", err);
+      return [];
+    }
+  }
+
+  // ✅ English API logic (default)
+  try {
     const response = await axios.get(
       `https://bible-go-api.rkeplin.com/v1/books/${bookId}/chapters/${chapter}?translation=${translationCode}`,
       {
@@ -265,27 +361,13 @@ export const fetchVersesForTranslation = async (
       }
     );
 
-    // Check structure of the response
-    let versesData = [];
+    if (Array.isArray(response.data)) return response.data;
+    if (Array.isArray(response.data.verses)) return response.data.verses;
 
-    if (Array.isArray(response.data)) {
-      // Response is directly an array of verses
-      versesData = response.data;
-    } else if (Array.isArray(response.data.verses)) {
-      // Response has a 'verses' key
-      versesData = response.data.verses;
-    } else {
-      console.warn(
-        `❌ Unrecognized response structure for ${translationCode}`,
-        response.data
-      );
-      return [];
-    }
-
-    console.log(`✅ API Response for ${translationCode}`, versesData);
-    return versesData;
+    console.warn("⚠️ Unexpected structure", response.data);
+    return [];
   } catch (error) {
-    console.error(`🚨 Failed to fetch verses for ${translationCode}`, error);
+    console.error("❌ Error fetching English verses:", error);
     return [];
   }
 };
@@ -297,25 +379,100 @@ export const fetchEnglishBooks = async () => {
 };
 
 // multilingualService.js (new API.Bible integration)
+
 export const fetchBibleBooks = async (languageCode = "en") => {
   if (languageCode === "en") {
-    return fetchEnglishBooks(); // Use your existing API
+    const englishBooks = await fetchEnglishBooks();
+    return englishBooks; // Already has testament field
   }
 
-  // Use API.Bible for other languages
   const bibleId = LANGUAGES[languageCode]?.bibleId;
   const response = await apiBible.get(`/bibles/${bibleId}/books`);
-  return transformApiBibleBooks(response.data.data);
+  return transformApiBibleBooks(response.data.data, languageCode);
 };
 
-const transformApiBibleBooks = (apiBibleBooks) => {
-  // Convert API.Bible format to match your current structure
+const transformApiBibleBooks = (apiBibleBooks, languageCode) => {
   return apiBibleBooks.map((book) => ({
     id: book.id,
-    name: book.name,
-    testament: book.testament || (book.id.includes("GEN") ? "OT" : "NT"),
-    chapterCount: book.chapters?.length || 50, // Fallback count
+    name: book.name, // For Igbo, Yoruba, Hausa, etc.
+    abbreviation: book.abbreviation || book.name?.slice(0, 3), // fallback
+    testament:
+      languageCode === "en"
+        ? book.testament || guessTestamentFromId(book.id)
+        : undefined, // Local languages won't use it
+    chapterCount: Array.isArray(book.chapters) ? book.chapters.length : 0, // avoid fake fallback
   }));
+};
+
+const guessTestamentFromId = (id) => {
+  const otBookIds = [
+    "GEN",
+    "EXO",
+    "LEV",
+    "NUM",
+    "DEU",
+    "JOS",
+    "JDG",
+    "RUT",
+    "1SA",
+    "2SA",
+    "1KI",
+    "2KI",
+    "1CH",
+    "2CH",
+    "EZR",
+    "NEH",
+    "EST",
+    "JOB",
+    "PSA",
+    "PRO",
+    "ECC",
+    "SNG",
+    "ISA",
+    "JER",
+    "LAM",
+    "EZK",
+    "DAN",
+    "HOS",
+    "JOL",
+    "AMO",
+    "OBA",
+    "JON",
+    "MIC",
+    "NAM",
+    "HAB",
+    "ZEP",
+    "HAG",
+    "ZEC",
+    "MAL",
+  ];
+  return otBookIds.includes(id) ? "OT" : "NT";
+};
+
+export const fetchChaptersForBook = async (languageCode, bookId) => {
+  try {
+    if (languageCode === "en") {
+      throw new Error("English does not use dynamic chapter fetching");
+    }
+
+    const bibleId = LANGUAGES[languageCode]?.bibleId;
+    if (!bibleId) {
+      throw new Error("No Bible ID found for language:", languageCode);
+    }
+
+    const response = await apiBible.get(
+      `/bibles/${bibleId}/books/${bookId}/chapters`
+    );
+    const chapters = response.data.data.filter((ch) => ch.number !== "intro");
+
+    return chapters.map((ch) => ({
+      chapterId: parseInt(ch.number),
+      bookId: ch.bookId,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch chapters for book:", error);
+    throw error;
+  }
 };
 
 // Helper function to cache books
@@ -350,6 +507,67 @@ const getCachedBooks = async () => {
     return parsedData.data;
   } catch (error) {
     console.error("Error getting cached books:", error);
+    return null;
+  }
+};
+
+// api/youtube.js
+const YOUTUBE_API_KEY = "AIzaSyAbN4WRfOcz4TvTDq2AXvyTa2YDdnIsX2U";
+const BASE_URL = "https://www.googleapis.com/youtube/v3/search";
+
+// Common fetch function with error handling
+const fetchYouTubeData = async (params) => {
+  try {
+    const queryString = new URLSearchParams({
+      key: YOUTUBE_API_KEY,
+      part: "snippet",
+      type: "video",
+      maxResults: 50,
+      ...params,
+    }).toString();
+
+    const response = await fetch(`${BASE_URL}?${queryString}`);
+
+    if (!response.ok) {
+      throw new Error(`YouTube API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.items || [];
+  } catch (error) {
+    console.error("YouTube API fetch failed:", error);
+    throw error; // Re-throw to let calling code handle it
+  }
+};
+
+// Fetch default gospel songs
+export const fetchDefaultSongs = async () => {
+  return fetchYouTubeData({
+    q: "gospel songs",
+    order: "viewCount", // Get popular videos first
+  });
+};
+
+// Search songs by query
+export const searchSongs = async (query) => {
+  if (!query || query.trim() === "") {
+    return fetchDefaultSongs(); // Fallback to default if empty query
+  }
+  return fetchYouTubeData({
+    q: `${query} gospel`, // Always include "gospel" in searches
+  });
+};
+
+// Optional: Fetch more details for a specific video
+export const getVideoDetails = async (videoId) => {
+  try {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?key=${YOUTUBE_API_KEY}&part=snippet,contentDetails&id=${videoId}`
+    );
+    const data = await response.json();
+    return data.items[0] || null;
+  } catch (error) {
+    console.error("Failed to fetch video details:", error);
     return null;
   }
 };

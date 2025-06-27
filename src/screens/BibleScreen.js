@@ -28,8 +28,9 @@ import {
   fetchBibleBooks,
   fetchChapter,
   fetchVersesForTranslation,
+  apiBible,
+  fetchChaptersForBook,
 } from "../utils/apiService";
-import { Picker } from "@react-native-picker/picker";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import VerseMenu from "../component/verseMenu";
@@ -43,7 +44,7 @@ const BibleScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("old");
-  const [currentLanguage, setCurrentLanguage] = useState("en"); // Default to English
+  const [selectedLanguage, setselectedLanguage] = useState("en"); // Default to English
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
   const [translations, setTranslations] = useState([]);
   const [currentTranslation, setCurrentTranslation] = useState(null);
@@ -79,10 +80,6 @@ const BibleScreen = () => {
         const asv = data.find((t) => t.abbreviation.toUpperCase() === "ASV");
         setCurrentTranslation(asv || data[0]);
       } catch (error) {
-        console.error("Failed to load translations:", error);
-        console.log("Translations:", translations);
-        console.log("Current:", currentTranslation);
-
         // Fallback to KJV and ASV
         setTranslations([
           { id: 2, abbreviation: "ASV", version: "American Standard Version" },
@@ -130,13 +127,13 @@ const BibleScreen = () => {
 
         // Load books based on current language
         let booksData;
-        if (currentLanguage === "en") {
+        if (selectedLanguage === "en") {
           // Use existing English API with local caching
           const cachedData = await loadBibleData();
           booksData = Array.isArray(cachedData?.books) ? cachedData.books : [];
         } else {
           // Use API.Bible for other languages
-          const apiBooks = await fetchBibleBooks(currentLanguage);
+          const apiBooks = await fetchBibleBooks(selectedLanguage);
           booksData = Array.isArray(apiBooks) ? apiBooks : [];
         }
 
@@ -177,12 +174,12 @@ const BibleScreen = () => {
       } catch (err) {
         console.error("Failed to load books:", err);
         setError(
-          `Failed to load ${LANGUAGES[currentLanguage]?.name || "Bible"}`
+          `Failed to load ${LANGUAGES[selectedLanguage]?.name || "Bible"}`
         );
 
         // Fallback to English if other language fails
-        if (currentLanguage !== "en") {
-          setCurrentLanguage("en");
+        if (selectedLanguage !== "en") {
+          setselectedLanguage("en");
         }
       } finally {
         setLoading(false);
@@ -190,93 +187,130 @@ const BibleScreen = () => {
     };
 
     initializeData();
-  }, [currentLanguage]);
+  }, [selectedLanguage]);
 
   const navigateTo = (view) => {
     setCurrentView(view);
   };
 
-  const handleBookPress = (book) => {
-    // Ensure we have the book data
+  // FUNCTION TO FETCH CHAPTERS
+  const handleBookPress = async (book) => {
     if (!book || !book.id) {
       console.error("Invalid book data:", book);
       return;
     }
 
-    // Create chapters array
-    const chaptersData = Array.from(
-      { length: book.chapterCount || 1 },
-      (_, i) => ({
-        chapterId: i + 1,
-        bookId: book.id,
-      })
-    );
+    try {
+      let chaptersData;
 
-    // Update state
-    setSelectedBook(book);
-    setChapters(chaptersData);
-    setVerses([]); // Clear previous verses
-    setError(null); // Clear any errors
-    navigateTo("chapters");
+      if (selectedLanguage !== "en") {
+        // ✅ Use API.Bible dynamic chapter fetch
+        chaptersData = await fetchChaptersForBook(selectedLanguage, book.id);
+      } else {
+        // ✅ Fallback for English using hardcoded count
+        chaptersData = Array.from(
+          { length: book.chapterCount || 1 },
+          (_, i) => ({
+            chapterId: i + 1,
+            bookId: book.id,
+          })
+        );
+      }
+
+      setSelectedBook(book);
+      setChapters(chaptersData);
+      setVerses([]);
+      setError(null);
+      navigateTo("chapters");
+    } catch (error) {
+      setError("Unable to load chapters. Please try again.");
+    }
   };
+
+  // // function to load verses whenever chapter is selected
 
   const handleChapterPress = async (chapter) => {
     try {
       setLoading(true);
       setSelectedChapter(chapter.chapterId);
 
-      const response = await fetchChapter(chapter.bookId, chapter.chapterId);
+      const response = await fetchChapter(
+        chapter.bookId,
+        chapter.chapterId,
+        selectedLanguage // ✅ Pass the selected language here
+      );
 
-      // Handle nested array structure from your logs
-      let versesArray = response.verses?.[0] || []; // Extract nested array
+      console.log("📦 Chapter raw response:", response);
+
+      let versesArray = response.verses?.[0] || [];
       if (!Array.isArray(versesArray)) versesArray = [];
 
       const formattedVerses = versesArray.map((verse, index) => {
-        // Fallback values for missing data
         const verseId = verse?.verseId ?? index + 1;
         return {
           id: verse?.id ?? `${chapter.bookId}-${chapter.chapterId}-${verseId}`,
           verseId: verseId,
-          text: verse?.verse ?? `Verse ${verseId}`,
-          book: verse?.book ?? {
-            id: chapter.bookId,
-            name: selectedBook?.name || "Unknown",
-            testament: selectedBook?.testament || "OT",
-          },
+          text: verse?.verse ?? verse?.text ?? `Verse ${verseId}`, // ✅ fallback for local language
         };
       });
+
+      console.log(
+        "✅ Formatted verses from handleChapterPress:",
+        formattedVerses
+      );
 
       setVerses(formattedVerses);
       navigateTo("verses");
     } catch (err) {
-      console.error("Verse loading failed:", err);
-      setVerses([]); // Clear any previous verses
+      console.error("❌ Verse loading failed:", err);
+      setVerses([]);
       setError("Couldn't load verses. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+
   // Function to format book name (first 3 letters, except for numbered books)
   const formatBookName = (name) => {
+    if (selectedLanguage !== "en") {
+      return name; // Full book name for local languages
+    }
+
+    // Keep abbreviating for English
     if (/^\d/.test(name)) {
-      // If starts with number, return first 5 characters
       return name.substring(0, 5).toUpperCase();
     }
     return name.substring(0, 3).toUpperCase();
   };
 
-  const renderBookItem = ({ item }) => (
-    <TouchableOpacity
-      style={[
-        styles.bookItem,
-        { width: (Dimensions.get("window").width - 40) / 5 },
-      ]}
-      onPress={() => handleBookPress(item)}
-      activeOpacity={0.7}
-    >
-      <Text style={styles.bookText}>{formatBookName(item.name)}</Text>
-    </TouchableOpacity>
-  );
+  const renderBookItem = ({ item }) => {
+    const columnCount = selectedLanguage === "en" ? 5 : 3;
+    const itemWidth = (Dimensions.get("window").width - 40) / columnCount;
+
+    // Check if the selected language is a local one
+    const isLocalLanguage = ["yo", "ig", "hau"].includes(selectedLanguage);
+
+    const displayName = isLocalLanguage
+      ? item.name.toUpperCase()
+      : formatBookName(item.name);
+
+    return (
+      <TouchableOpacity
+        style={[styles.bookItem, { width: itemWidth }]}
+        onPress={() => handleBookPress(item)}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={[
+            styles.bookText,
+            isLocalLanguage && { fontSize: 11 }, // 👈 Adjust this size as you like
+          ]}
+        >
+          {displayName}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const renderChapterItem = ({ item }) => (
     <TouchableOpacity
@@ -313,6 +347,7 @@ const BibleScreen = () => {
               setShowActionBox(true);
             }
           }}
+          style={{ paddingBottom: 10 }}
         >
           <View style={styles.verseChapterWrapper}>
             <Text style={styles.verseNumber}>
@@ -455,14 +490,14 @@ const BibleScreen = () => {
 
   const renderLanguageSelector = () => (
     <View style={styles.languageSelector}>
-      <Text style={styles.currentLanguage}>
-        {LANGUAGES[currentLanguage].name}
-      </Text>
       <TouchableOpacity
         onPress={() => setShowLanguageSelector(true)}
         style={styles.languageButton}
       >
-        <Icon name="chevron-down" size={20} color="#fff" />
+        <Text style={styles.selectedLanguage}>
+          {LANGUAGES[selectedLanguage].name}
+        </Text>
+        <Icon name="chevron-down" size={24} color="#fff" stokeWidth="10" />
       </TouchableOpacity>
 
       <Modal visible={showLanguageSelector} transparent animationType="fade">
@@ -473,12 +508,12 @@ const BibleScreen = () => {
           <TouchableOpacity
             style={styles.languageOption}
             onPress={() => {
-              setCurrentLanguage("en");
+              setselectedLanguage("en");
               setShowLanguageSelector(false);
             }}
           >
             <Text>English</Text>
-            {currentLanguage === "en" && (
+            {selectedLanguage === "en" && (
               <Icon name="check" size={20} color="green" />
             )}
           </TouchableOpacity>
@@ -491,13 +526,18 @@ const BibleScreen = () => {
                   key={code}
                   style={styles.languageOption}
                   onPress={() => {
-                    setCurrentLanguage(code);
+                    setselectedLanguage(code);
                     setShowLanguageSelector(false);
                   }}
                 >
                   <Text>{lang.name}</Text>
-                  {currentLanguage === code && (
-                    <Icon name="check" size={20} color="green" />
+                  {selectedLanguage === code && (
+                    <Icon
+                      name="check"
+                      size={24}
+                      color="green"
+                      stokeWidth="10"
+                    />
                   )}
                 </TouchableOpacity>
               )
@@ -514,6 +554,7 @@ const BibleScreen = () => {
     </View>
   );
 
+  // Function to toggle speech reading of verses
   const toggleSpeech = () => {
     if (isReading) {
       Speech.stop();
@@ -585,50 +626,77 @@ const BibleScreen = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+
       {/* Books View */}
       {currentView === "books" && (
         <>
           <View style={styles.tabContainer}>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                activeTab === "old" && styles.activeTab,
-              ]}
-              onPress={() => setActiveTab("old")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "old" && styles.activeTabText,
-                ]}
-              >
-                OT
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.tabButton,
-                activeTab === "new" && styles.activeTab,
-              ]}
-              onPress={() => setActiveTab("new")}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === "new" && styles.activeTabText,
-                ]}
-              >
-                NT
-              </Text>
-            </TouchableOpacity>
+            {selectedLanguage === "en" ? (
+              // ✅ OT/NT toggle section
+              <View style={styles.toggleTabs}>
+                <TouchableOpacity
+                  style={[
+                    styles.tabButton,
+                    activeTab === "old" && styles.activeTab,
+                  ]}
+                  onPress={() => setActiveTab("old")}
+                >
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "old" && styles.activeTabText,
+                    ]}
+                  >
+                    OT
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.tabButton,
+                    activeTab === "new" && styles.activeTab,
+                  ]}
+                  onPress={() => setActiveTab("new")}
+                >
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === "new" && styles.activeTabText,
+                    ]}
+                  >
+                    NT
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              // ✅ Language header for local languages
+              <View style={styles.languageHeader}>
+                <Text style={styles.languageHeaderText}>
+                  Bible in{" "}
+                  {LANGUAGES[selectedLanguage]?.name || "Selected Language"}
+                </Text>
+              </View>
+            )}
+
+            {/* ✅ Always show language selector */}
             {renderLanguageSelector()}
           </View>
 
+          {/* ✅ FlatList comes below */}
           <FlatList
-            data={activeTab === "old" ? oldTestamentBooks : newTestamentBooks}
+            data={
+              selectedLanguage === "en"
+                ? activeTab === "old"
+                  ? oldTestamentBooks
+                  : newTestamentBooks
+                : books
+            }
             renderItem={renderBookItem}
             keyExtractor={(item) => item.id.toString()}
-            numColumns={5}
+            numColumns={selectedLanguage === "en" ? 5 : 3}
+            key={`book-list-${selectedLanguage}-${
+              selectedLanguage === "en" ? activeTab : "all"
+            }`}
             contentContainerStyle={styles.booksGrid}
           />
         </>
@@ -850,23 +918,6 @@ const BibleScreen = () => {
                 }}
               />
             </TouchableOpacity>
-
-            {/* AUDIO BUTTON */}
-            {/* <TouchableOpacity
-              onPress={toggleSpeech}
-              style={{
-                backgroundColor: isReading ? "#FF3B30" : "#007AFF",
-                padding: 12,
-                borderRadius: 50,
-                elevation: 3,
-              }}
-            >
-              <Ionicons
-                name={isReading ? "stop" : "volume-high"}
-                size={10}
-                color="#fff"
-              />
-            </TouchableOpacity> */}
           </View>
         </View>
       )}
@@ -916,11 +967,11 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   activeTabText: {
-    color: "#fff",
+    color: "#B3E5FC",
   },
   booksGrid: {
     paddingHorizontal: 10,
-    paddingBottom: 20,
+    paddingBottom: 80,
   },
   bookItem: {
     justifyContent: "center",
@@ -930,10 +981,11 @@ const styles = StyleSheet.create({
     margin: 2,
     elevation: 1,
     aspectRatio: 1,
+    padding: 3,
   },
   bookText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "bold",
     color: "#4263eb",
     // color: "#343a40",
   },
@@ -942,6 +994,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "#4263eb",
     backgroundColor: "#f8f9fa",
     marginTop: 26,
+    paddingBottom: 50,
   },
   chapterHeader: {
     padding: 8,
@@ -999,6 +1052,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginTop: 26,
     position: "relative",
+    paddingBottom: 100,
   },
   verseHeader: {
     padding: 10,
@@ -1124,18 +1178,22 @@ const styles = StyleSheet.create({
   },
 
   languageSelector: {
-    flexDirection: "row",
     alignItems: "center",
-    padding: 10,
-    // backgroundColor: "#ccc",
     alignSelf: "flex-end",
-    width: "100px",
   },
-  currentLanguage: {
+  selectedLanguage: {
     marginRight: 10,
     fontWeight: "bold",
     fontSize: 17,
-    color: "#495057",
+    color: "#B3E5FC",
+    // color: "#495057",
+  },
+  languageButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 10,
+    // backgroundColor: "#4263eb",
+    borderRadius: 5,
   },
   modalContent: {
     // flex: 1,
@@ -1263,11 +1321,23 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
-  // floatingAiButton: {
-  //   padding: 14,
-  //   borderRadius: 50,
-  //   elevation: 6,
-  // },
+  languageHeader: {
+    alignItems: "center",
+    // marginBottom: 10,
+    // marginTop: 40,
+  },
+  languageHeaderText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#B3E5FC",
+  },
+  toggleTabs: {
+    flexDirection: "row",
+    padding: 1,
+    gap: 10,
+    // backgroundColor: "#495057",
+    width: 100,
+  },
 });
 
 export default BibleScreen;

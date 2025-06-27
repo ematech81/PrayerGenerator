@@ -92,26 +92,6 @@ Verse: ${verse.text}`,
     }
   }, [fullResponse]);
 
-  // useEffect(() => {
-  //   if (fullResponse) {
-  //     // const paragraphs = fullResponse.split("\n\n");
-  //     // let i = 0;
-  //     // const interval = setInterval(() => {
-  //     //   setChatText((prev) => prev + paragraphs[i] + "\n\n");
-  //     //   i++;
-  //     //   if (i >= paragraphs.length) clearInterval(interval);
-  //     // }, 100); // 1 paragraph per 500ms
-  //     let i = 0;
-  //     const interval = setInterval(() => {
-  //       setChatText((prev) => prev + fullResponse[i]);
-  //       i++;
-  //       if (i >= fullResponse.length) clearInterval(interval);
-  //     }, 20); // 1 paragraph per 500ms
-  //     // typing speed
-  //     return () => clearInterval(interval);
-  //   }
-  // }, [fullResponse]);
-
   useEffect(() => {
     fetchExplanation();
   }, []);

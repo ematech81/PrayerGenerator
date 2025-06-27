@@ -5,12 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from "react-native";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { MotiView } from "moti";
 import { useNavigation } from "@react-navigation/native";
+import bibleReading from "../assets/bibleReading.png";
 
 const { width } = Dimensions.get("window");
+
+const prayerImage = require("../assets/prayer-hand.jpg");
 
 const steps = [
   {
@@ -58,6 +62,7 @@ const HowToPrayScreen = () => {
       setCurrentStep(currentStep + 1);
     }
   };
+  const { width } = Dimensions.get("window");
 
   const navigation = useNavigation();
 
@@ -67,8 +72,15 @@ const HowToPrayScreen = () => {
     }
   };
 
+  // const Image = require("../assets/prayer-hand.jpg");
+
   return (
     <View style={styles.container}>
+      <Image
+        source={prayerImage}
+        resizeMode="cover"
+        style={[styles.headerImage, { width: width }]}
+      />
       <TouchableOpacity
         style={styles.closeButton}
         onPress={() => navigation.goBack()}
@@ -123,11 +135,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#071738",
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
     justifyContent: "center",
     paddingBottom: 70,
   },
-
+  headerImage: {
+    height: 200,
+    // borderRadius: 16,
+    marginBottom: 20,
+  },
   closeButton: {
     position: "absolute",
     top: 50,
@@ -138,7 +154,7 @@ const styles = StyleSheet.create({
   },
   card: {
     // backgroundColor: "#f9f9f9",
-    padding: 14,
+    padding: 16,
     width: "96%",
   },
   title: {
