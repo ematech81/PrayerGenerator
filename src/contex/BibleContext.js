@@ -4,16 +4,20 @@ import axios from "axios";
 export const BibleContext = createContext();
 
 export const BibleProvider = ({ children }) => {
-  // Existing Bible state (keep your current state here)
-  const [bibleData, setBibleData] = useState(null);
-  const [currentBook, setCurrentBook] = useState(null);
-  const [currentChapter, setCurrentChapter] = useState(null);
-
   // Player state
   const [currentVideoId, setCurrentVideoId] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isAudioMode, setIsAudioMode] = useState(false);
-  const [playerStatus, setPlayerStatus] = useState("idle"); // 'idle', 'loading', 'playing', 'paused'
+  const [playerStatus, setPlayerStatus] = useState("idle"); // 'idle',
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [showPlayerOptions, setShowPlayerOptions] = useState(false);
+  const [showAudioModal, setShowAudioModal] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+
+  // fuction to select video to play
+  const selectVideo = (video) => {
+    setSelectedVideo(video);
+  };
 
   // Player controls
   const playVideo = (videoId) => {
@@ -22,15 +26,28 @@ export const BibleProvider = ({ children }) => {
     setPlayerStatus("playing");
   };
 
-  const togglePlayback = (value) => {
+  const togglePlayback = async (value) => {
     if (value !== undefined) {
       setIsPlaying(value);
       setPlayerStatus(value ? "playing" : "paused");
     } else {
-      setIsPlaying((prev) => !prev);
-      setPlayerStatus((prev) => (prev === "playing" ? "paused" : "playing"));
+      setIsPlaying((prev) => {
+        const next = !prev;
+        setPlayerStatus(next ? "playing" : "paused");
+        return next;
+      });
     }
   };
+
+  // const togglePlayback = (value) => {
+  //   if (value !== undefined) {
+  //     setIsPlaying(value);
+  //     setPlayerStatus(value ? "playing" : "paused");
+  //   } else {
+  //     setIsPlaying((prev) => !prev);
+  //     setPlayerStatus((prev) => (prev === "playing" ? "paused" : "playing"));
+  //   }
+  // };
 
   const toggleAudioMode = (value) => {
     if (value !== undefined) {
@@ -38,6 +55,34 @@ export const BibleProvider = ({ children }) => {
     } else {
       setIsAudioMode((prev) => !prev);
     }
+  };
+
+  const playAsAudio = () => {
+    setIsAudioMode(true);
+    setShowAudioModal(true);
+    setPlayerStatus("playing");
+    setIsPlaying(true);
+    setShowPlayerOptions(false);
+  };
+
+  const playAsVideo = () => {
+    setIsAudioMode(false);
+    setShowVideoModal(true);
+    setPlayerStatus("playing");
+    setIsPlaying(true);
+    setShowPlayerOptions(false);
+  };
+
+  const closeAudioModal = () => {
+    setShowAudioModal(false);
+    setIsPlaying(false);
+    setPlayerStatus("paused");
+  };
+
+  const closeVideoModal = () => {
+    setShowVideoModal(false);
+    setIsPlaying(false);
+    setPlayerStatus("paused");
   };
 
   // Your existing Bible functions (keep these)
@@ -49,6 +94,10 @@ export const BibleProvider = ({ children }) => {
     <BibleContext.Provider
       value={{
         // Player-related values and functions
+        selectedVideo,
+        setSelectedVideo,
+        showPlayerOptions,
+        selectVideo,
         currentVideoId,
         isPlaying,
         isAudioMode,
@@ -56,6 +105,13 @@ export const BibleProvider = ({ children }) => {
         playVideo,
         togglePlayback,
         toggleAudioMode,
+        showAudioModal,
+        setShowVideoModal,
+        showVideoModal,
+        playAsAudio,
+        playAsVideo,
+        closeAudioModal,
+        closeVideoModal,
       }}
     >
       {children}

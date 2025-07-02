@@ -17,7 +17,7 @@
     "@react-navigation/native": "^7.1.10",
     "@react-navigation/native-stack": "^7.3.14",
     "axios": "^1.9.0",
-    "expo": "53.0.13",
+    "expo": "^53.0.15",
     "expo-linear-gradient": "~14.1.5",
     "expo-speech": "~13.1.7",
     "expo-sqlite": "~15.2.12",
@@ -36,9 +36,10 @@
     "react-native-tab-view": "^4.1.2",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "^0.20.0",
-    "react-native-web-webview": "^1.0.2",
-    "react-native-youtube-iframe": "^2.3.0",
-    "tailwindcss": "^3.4.17"
+    "react-native-webview": "^13.13.5",
+    "react-native-youtube-iframe": "^2.4.0",
+    "tailwindcss": "^3.4.17",
+    "@react-native-community/slider": "4.5.6"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -7,11 +7,15 @@ import {
   Text,
   ActivityIndicator,
   StyleSheet,
+  StatusBar,
 } from "react-native";
 
 import { fetchDefaultSongs, searchSongs } from "../utils/apiService";
 import { BibleContext } from "../contex/BibleContext";
-import SongItem from "../component/SongItem";
+import PlayerOptionsCard from "../videoComponent/PlayerOptionCard";
+import SongItem from "../videoComponent/SongItem";
+import AudioPlayerModal from "../videoComponent/AudioPlayerModal";
+import VideoPlayerModal from "../videoComponent/VideoPlayerModal";
 
 const SongScreen = () => {
   const [activeTab, setActiveTab] = useState("songs");
@@ -21,38 +25,39 @@ const SongScreen = () => {
   const [error, setError] = useState(null);
   const { currentVideoId, isPlaying } = useContext(BibleContext);
 
-  // Fetch songs with error handling
-  const fetchSongs = async (fetchFunction) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await fetchFunction();
-      setSongs(data);
-    } catch (err) {
-      setError("Failed to load songs. Please try again.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch default songs on load
+  // Fetch default songs on mount
   useEffect(() => {
-    fetchSongs(fetchDefaultSongs);
+    const loadDefaultSongs = async () => {
+      try {
+        const data = await fetchDefaultSongs();
+        setSongs(data);
+      } catch (error) {
+        console.error("Error loading default songs:", error);
+      }
+    };
+
+    loadDefaultSongs();
   }, []);
 
-  // Search songs (debounced)
+  // Fetch songs based on searchQuery
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      fetchSongs(fetchDefaultSongs);
-      return;
-    }
+    const loadSongs = async () => {
+      try {
+        if (searchQuery.trim() === "") {
+          const data = await fetchDefaultSongs();
+          setSongs(data);
+        } else {
+          const data = await searchSongs(searchQuery);
+          setSongs(data);
+        }
+      } catch (error) {
+        console.error("Error searching songs:", error);
+      }
+    };
 
-    const timer = setTimeout(() => {
-      fetchSongs(() => searchSongs(searchQuery));
-    }, 500);
+    const timer = setTimeout(loadSongs, 500); // debounce search
 
-    return () => clearTimeout(timer);
+    return () => clearTimeout(timer); // cleanup timer
   }, [searchQuery]);
 
   // Filter songs based on tab
@@ -70,7 +75,7 @@ const SongScreen = () => {
     return (
       <View style={styles.centerContainer}>
         <Text style={styles.errorText}>{error}</Text>
-        <TouchableOpacity onPress={() => fetchSongs(fetchDefaultSongs)}>
+        <TouchableOpacity onPress={() => fetchDefaultSongs()}>
           <Text style={styles.retryText}>Retry</Text>
         </TouchableOpacity>
       </View>
@@ -87,9 +92,11 @@ const SongScreen = () => {
 
   return (
     <View style={styles.container}>
+      <StatusBar backgroundColor="#1e2572" barStyle="light-content" />
       {/* Search Bar */}
       <TextInput
         placeholder="Search gospel songs..."
+        placeholderTextColor="#ccc"
         value={searchQuery}
         onChangeText={setSearchQuery}
         style={styles.searchBar}
@@ -130,6 +137,14 @@ const SongScreen = () => {
           </View>
         }
       />
+      {/* display option to select either video or audio */}
+      <PlayerOptionsCard />
+
+      {/* modal for audio player */}
+      <AudioPlayerModal />
+
+      {/* modal for video player */}
+      <VideoPlayerModal />
     </View>
   );
 };
@@ -138,18 +153,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+    backgroundColor: "#1e2572",
   },
   searchBar: {
     padding: 10,
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 5,
+    marginTop: 30,
     marginBottom: 10,
+    color: "#fff",
   },
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginBottom: 10,
+    marginBottom: 15,
   },
   tab: {
     padding: 10,
@@ -157,8 +175,13 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     padding: 10,
-    color: "#6200ee",
+    color: "#fff",
+    // color: "#6200ee",
     fontWeight: "bold",
+    fontSize: 18,
+    borderBottomWidth: 2,
+    borderBottomColor: "#ff008c",
+    // borderBottomColor: "#6200ee",
   },
   centerContainer: {
     flex: 1,

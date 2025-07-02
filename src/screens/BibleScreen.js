@@ -629,7 +629,7 @@ const BibleScreen = () => {
 
       {/* Books View */}
       {currentView === "books" && (
-        <>
+        <View style={{ width: "100%" }}>
           <View style={styles.tabContainer}>
             {selectedLanguage === "en" ? (
               // ✅ OT/NT toggle section
@@ -699,7 +699,7 @@ const BibleScreen = () => {
             }`}
             contentContainerStyle={styles.booksGrid}
           />
-        </>
+        </View>
       )}
 
       {/* Chapters View */}
@@ -941,16 +941,16 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: "row",
-    margin: 16,
-    borderRadius: 12,
+    marginBottom: 16,
+    // borderRadius: 12,
     overflow: "hidden",
     backgroundColor: "#4263eb",
     elevation: 2,
     marginTop: 40,
     alignItems: "center",
     justifyContent: "space-around",
-    width: "96%",
-    marginHorizontal: "auto",
+    width: "100%",
+    // marginHorizontal: "auto",
   },
   tabButton: {
     padding: 10,

@@ -512,7 +512,7 @@ const getCachedBooks = async () => {
 };
 
 // api/youtube.js
-const YOUTUBE_API_KEY = "AIzaSyAbN4WRfOcz4TvTDq2AXvyTa2YDdnIsX2U";
+const YOUTUBE_API_KEY = "AIzaSyBnFFG6FByM4wgmUx7ZscbezehgvbDFYPU";
 const BASE_URL = "https://www.googleapis.com/youtube/v3/search";
 
 // Common fetch function with error handling

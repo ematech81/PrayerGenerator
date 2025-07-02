@@ -10,6 +10,7 @@ import AIScreen from "./src/screens/AIScreen";
 import HowToPrayScreen from "./src/screens/HowToPrayScreen";
 import DailyReadingScreen from "./src/screens/DailyReadingScreen";
 import DevotionScreen from "./src/screens/DevotionScreen";
+import AudioPlayerScreen from "./src/screens/AudioPlayerScreen";
 import { initializeDatabase } from "./src/Database/SqlHelper";
 import { useEffect } from "react";
 import { syncTranslationsToSQLite } from "./src/SQLDatabaseFill";
@@ -58,6 +59,11 @@ export default function App() {
             name="DevotionScreen"
             component={DevotionScreen}
             // options={{ title: "Bible Teacher" }}
+          />
+          <Stack.Screen
+            name="AudioPlayerScreen"
+            component={AudioPlayerScreen}
+            options={{ title: "Audio Player" }}
           />
         </Stack.Navigator>
       </NavigationContainer>
