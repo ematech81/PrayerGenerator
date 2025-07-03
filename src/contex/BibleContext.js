@@ -13,6 +13,7 @@ export const BibleProvider = ({ children }) => {
   const [showPlayerOptions, setShowPlayerOptions] = useState(false);
   const [showAudioModal, setShowAudioModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // fuction to select video to play
   const selectVideo = (video) => {

@@ -92,7 +92,7 @@ const SongScreen = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar backgroundColor="#1e2572" barStyle="light-content" />
+      <StatusBar backgroundColor="#081329" barStyle="light-content" />
       {/* Search Bar */}
       <TextInput
         placeholder="Search gospel songs..."
@@ -153,7 +153,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
-    backgroundColor: "#1e2572",
+    backgroundColor: "#081329",
+    // backgroundColor: "#1e2572",
   },
   searchBar: {
     padding: 10,
