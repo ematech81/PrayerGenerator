@@ -16,6 +16,9 @@ import { useEffect } from "react";
 import { syncTranslationsToSQLite } from "./src/SQLDatabaseFill";
 import { Platform } from "react-native";
 import { fetchVersesFromApiBible } from "./src/utils/apiService";
+import VerseScreen from "./src/screens/VerseScreen";
+import ChaptersScreen from "./src/screens/ChaptersScreen";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Stack = createNativeStackNavigator();
 
@@ -30,43 +33,47 @@ export default function App() {
 
   return (
     <BibleProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* Bottom tabs. */}
-          <Stack.Screen name="MainTabs" component={BottomTabs} />
+      <SafeAreaProvider>
+        <NavigationContainer>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {/* Bottom tabs. */}
+            <Stack.Screen name="MainTabs" component={BottomTabs} />
 
-          <Stack.Screen
-            name="PrayerPointScreen"
-            component={PrayerPointScreen}
-          />
-          <Stack.Screen name="GeneratedScreen" component={GeneratedScreen} />
-          <Stack.Screen
-            name="AIScreen"
-            component={AIScreen}
-            options={{ title: "Bible Teacher" }}
-          />
-          <Stack.Screen
-            name="HowToPrayScreen"
-            component={HowToPrayScreen}
-            // options={{ title: "Bible Teacher" }}
-          />
-          <Stack.Screen
-            name="DailyReadingScreen"
-            component={DailyReadingScreen}
-            // options={{ title: "Bible Teacher" }}
-          />
-          <Stack.Screen
-            name="DevotionScreen"
-            component={DevotionScreen}
-            // options={{ title: "Bible Teacher" }}
-          />
-          <Stack.Screen
-            name="AudioPlayerScreen"
-            component={AudioPlayerScreen}
-            options={{ title: "Audio Player" }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
+            <Stack.Screen
+              name="PrayerPointScreen"
+              component={PrayerPointScreen}
+            />
+            <Stack.Screen name="GeneratedScreen" component={GeneratedScreen} />
+            <Stack.Screen
+              name="AIScreen"
+              component={AIScreen}
+              options={{ title: "Bible Teacher" }}
+            />
+            <Stack.Screen
+              name="HowToPrayScreen"
+              component={HowToPrayScreen}
+              // options={{ title: "Bible Teacher" }}
+            />
+            <Stack.Screen
+              name="DailyReadingScreen"
+              component={DailyReadingScreen}
+              // options={{ title: "Bible Teacher" }}
+            />
+            <Stack.Screen
+              name="DevotionScreen"
+              component={DevotionScreen}
+              // options={{ title: "Bible Teacher" }}
+            />
+            <Stack.Screen
+              name="AudioPlayerScreen"
+              component={AudioPlayerScreen}
+              options={{ title: "Audio Player" }}
+            />
+            <Stack.Screen name="ChaptersScreen" component={ChaptersScreen} />
+            <Stack.Screen name="VerseScreen" component={VerseScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaProvider>
     </BibleProvider>
   );
 }

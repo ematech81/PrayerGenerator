@@ -27,19 +27,6 @@ export const BibleProvider = ({ children }) => {
     setPlayerStatus("playing");
   };
 
-  const togglePlayback = async (value) => {
-    if (value !== undefined) {
-      setIsPlaying(value);
-      setPlayerStatus(value ? "playing" : "paused");
-    } else {
-      setIsPlaying((prev) => {
-        const next = !prev;
-        setPlayerStatus(next ? "playing" : "paused");
-        return next;
-      });
-    }
-  };
-
   // const togglePlayback = (value) => {
   //   if (value !== undefined) {
   //     setIsPlaying(value);
@@ -104,7 +91,7 @@ export const BibleProvider = ({ children }) => {
         isAudioMode,
         playerStatus,
         playVideo,
-        togglePlayback,
+        // togglePlayback,
         toggleAudioMode,
         showAudioModal,
         setShowVideoModal,

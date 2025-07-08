@@ -317,7 +317,7 @@ export const fetchVersesFromApiBible = async (bibleId, passageId) => {
 
     return formattedVerses;
   } catch (error) {
-    console.error("❌ Failed to fetch local language verses:", error);
+    // console.error("❌ Failed to fetch local language verses:", error);
     return [];
   }
 };
@@ -367,7 +367,7 @@ export const fetchVersesForTranslation = async (
     console.warn("⚠️ Unexpected structure", response.data);
     return [];
   } catch (error) {
-    console.error("❌ Error fetching English verses:", error);
+    // console.error("❌ Error fetching English verses:", error);
     return [];
   }
 };

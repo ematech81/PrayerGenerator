@@ -28,15 +28,18 @@ const AudioPlayerScreen = () => {
     currentVideoId,
     isPlaying,
     playerStatus,
-    togglePlayback,
+    // togglePlayback,
     setShowVideoModal,
     playVideo,
     showVideoModal,
+    setIsPlaying,
+    setPlayerStatus,
   } = useContext(BibleContext);
 
   const playerRef = useRef(null);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
+  const [isPlayerReady, setisPlayerReady] = useState(false);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -82,15 +85,6 @@ const AudioPlayerScreen = () => {
     checkDuration();
   }, [playerRef, currentVideoId]);
 
-  // Sync internal YouTube player state
-  const onStateChange = useCallback((state) => {
-    if (state === "playing") {
-      // keep syncing to context
-    } else if (state === "paused" || state === "ended") {
-      togglePlayback(false);
-    }
-  }, []);
-
   if (!selectedVideo) {
     return (
       <View style={styles.centered}>
@@ -98,6 +92,36 @@ const AudioPlayerScreen = () => {
       </View>
     );
   }
+
+  useEffect(() => {
+    console.log(playerRef.current); // Should log the player instance
+  }, []);
+
+  const onPlay = useCallback(() => {
+    setIsPlaying(true);
+    setPlayerStatus("playing");
+  }, []);
+
+  const onPause = useCallback(() => {
+    setIsPlaying(false);
+    setPlayerStatus("paused");
+  }, []);
+
+  // Toggle via direct player methods
+  const togglePlayback = useCallback(() => {
+    if (!isPlayerReady) return; // ⚠️ Wait for readiness
+
+    if (isPlaying) {
+      playerRef.current?.pause();
+    } else {
+      playerRef.current?.play();
+    }
+  }, [isPlaying, isPlayerReady]);
+
+  // Modify your onChangeState to handle more cases
+  const handleStateChange = useCallback((state) => {
+    setIsPlaying(state === "playing");
+  }, []);
 
   const thumbnail = selectedVideo.snippet?.thumbnails?.high?.url;
   const title = selectedVideo.snippet?.title;
@@ -178,6 +202,29 @@ const AudioPlayerScreen = () => {
       <YoutubePlayer
         ref={playerRef}
         height={200}
+        play={isPlaying} // Still useful for initial state
+        videoId={currentVideoId}
+        onChangeState={handleStateChange}
+        onReady={() => {
+          console.log(
+            "Player ref methods:",
+            Object.keys(playerRef.current || {})
+          ); // Debug
+          playerRef.current
+            ?.getDuration()
+            .then(setDuration)
+            .catch(console.error);
+
+          if (isPlaying) {
+            console.log("Attempting to play...");
+            playerRef.current?.play?.(); // Optional chaining as fallback
+          }
+        }}
+      />
+
+      {/* <YoutubePlayer
+        ref={playerRef}
+        height={0}
         play={isPlaying}
         videoId={currentVideoId}
         onReady={() =>
@@ -187,9 +234,15 @@ const AudioPlayerScreen = () => {
             .catch(() => {})
         }
         onChangeState={(state) => {
-          if (state === "ended") togglePlayback(false);
+          console.log("Player state:", state);
+
+          if (state === "playing") {
+            onPlay(); // Sync app state
+          } else if (state === "paused" || state === "ended") {
+            onPause(); // Sync app state
+          }
         }}
-      />
+      /> */}
 
       {/* Optional Video Modal */}
       {showVideoModal && <VideoPlayerModal />}

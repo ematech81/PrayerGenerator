@@ -12,19 +12,44 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { devotion } from "../constant/DummyDevtion";
 import bibleReading from "../assets/bibleReading.png";
+import { getTodayDayIndex } from "../utils/dateHelper";
+import { dailyDevotionDatabase } from "../Database/dailyDevotionDatabase"; // Uncomment if using local data
+import { fetchEnglishBooks } from "../utils/apiService";
 
 const DailyReadingScreen = () => {
   const navigation = useNavigation();
   const { width } = Dimensions.get("window");
 
-  const dailyReading = {
-    date: "June 23, 2025",
-    image: require("../assets/prayer-hand.jpg"),
-    readings: [
-      { book: "John", chapter: 15 },
-      { book: "Proverbs", chapter: 3 },
-      { book: "Isaiah", chapter: 40 },
-    ],
+  const todayIndex = getTodayDayIndex();
+  // const todayIndex = 1;
+  const todayDevotion = dailyDevotionDatabase.find((d) => d.day === todayIndex);
+  console.log("TodayIndex:", todayIndex);
+  console.log(
+    "Available days:",
+    dailyDevotionDatabase.map((d) => d.day)
+  );
+
+  const handleReadingTap = async (bookName, chapter, verse = 1) => {
+    try {
+      const allBooks = await fetchEnglishBooks();
+
+      const selectedBook = allBooks.find(
+        (b) => b.name.toLowerCase() === bookName.toLowerCase()
+      );
+
+      if (!selectedBook) {
+        console.warn(`Book not found: ${bookName}`);
+        return;
+      }
+
+      navigation.navigate("VerseScreen", {
+        selectedBook,
+        selectedChapter: chapter,
+        selectedVerse: verse,
+      });
+    } catch (err) {
+      console.error("Error fetching book for daily reading:", err);
+    }
   };
 
   return (
@@ -38,7 +63,7 @@ const DailyReadingScreen = () => {
 
       {/* Title */}
       <Text style={styles.title}>Daily Bible Reading</Text>
-      <Text style={styles.date}>{dailyReading.date}</Text>
+      <Text style={styles.date}>04-06-2025</Text>
 
       {/* Subheading */}
       <Text style={styles.subheading}>Spend time in God’s Word today</Text>
@@ -46,18 +71,38 @@ const DailyReadingScreen = () => {
       {/* Reading List */}
       <View style={styles.readingContainer}>
         <Text style={styles.readingHeader}>📖 Today's Reading:</Text>
-        {dailyReading.readings.map((reading, index) => (
-          <Text key={index} style={styles.readingItem}>
-            • {reading.book} {reading.chapter}
+
+        {todayDevotion ? (
+          todayDevotion.readings.map((reading, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() =>
+                handleReadingTap(
+                  reading.book,
+                  reading.chapter,
+                  reading.startVerse
+                )
+              }
+            >
+              <Text style={styles.readingItem}>
+                {reading.book} {reading.chapter}
+              </Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <Text style={styles.fallbackText}>
+            Today's devotion is not available yet. Please check back later.
           </Text>
-        ))}
+        )}
       </View>
 
       {/* Devotion Button */}
 
       <TouchableOpacity
         style={styles.buttonContainer}
-        onPress={() => navigation.navigate("DevotionScreen")}
+        onPress={
+          (() => navigation.navigate("DevotionScreen"), { day: todayIndex })
+        }
       >
         <ImageBackground
           source={require("../assets/preImgDevotion.png")}
@@ -176,6 +221,12 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 14,
     color: "#eee",
+  },
+  fallbackText: {
+    fontSize: 16,
+    color: "#9ca3af",
+    textAlign: "center",
+    marginTop: 12,
   },
 });
 
