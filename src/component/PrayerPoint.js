@@ -25,7 +25,7 @@ const PrayerPoint = () => {
 
         <View style={{}}>
           <Pressable onPress={() => Navigation.navigate("Prayer")}>
-            <Text style={{ color: "#fff", fontSize: 14, paddingRight: 10 }}>
+            <Text style={{ color: "#333", fontSize: 14, paddingRight: 10 }}>
               See all
             </Text>
           </Pressable>
@@ -64,12 +64,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     padding: 10,
-    backgroundColor: "#ccc",
+    backgroundColor: "#ddd",
     // backgroundColor: "#321033",
     // backgroundColor: "#dbea",
     width: "96%",
     // shadowColor: "#000",
     marginHorizontal: "auto",
+    elevation: 3,
   },
 
   prayerPointHeading: {

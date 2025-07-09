@@ -15,6 +15,52 @@ import bibleReading from "../assets/bibleReading.png";
 import { getTodayDayIndex } from "../utils/dateHelper";
 import { dailyDevotionDatabase } from "../Database/dailyDevotionDatabase"; // Uncomment if using local data
 import { fetchEnglishBooks } from "../utils/apiService";
+import { getFormattedToday } from "../utils/TodayDate";
+// import { formatStyledText } from "./DevotionScreen";
+
+// 👇 Helper to format **bold** text
+const formatStyledText = (text) => {
+  const elements = [];
+
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+  let lastIndex = 0;
+
+  const matches = text.matchAll(regex);
+
+  for (const match of matches) {
+    const matchText = match[0];
+    const index = match.index;
+
+    // Push text before the match
+    if (index > lastIndex) {
+      elements.push(text.substring(lastIndex, index));
+    }
+
+    // Style match
+    if (matchText.startsWith("**")) {
+      elements.push(
+        <Text key={index} style={{ fontWeight: "bold" }}>
+          {matchText.slice(2, -2)}
+        </Text>
+      );
+    } else if (matchText.startsWith("*")) {
+      elements.push(
+        <Text key={index} style={{ fontStyle: "italic" }}>
+          {matchText.slice(1, -1)}
+        </Text>
+      );
+    }
+
+    lastIndex = index + matchText.length;
+  }
+
+  // Push remaining text
+  if (lastIndex < text.length) {
+    elements.push(text.slice(lastIndex));
+  }
+
+  return elements;
+};
 
 const DailyReadingScreen = () => {
   const navigation = useNavigation();
@@ -46,6 +92,7 @@ const DailyReadingScreen = () => {
         selectedBook,
         selectedChapter: chapter,
         selectedVerse: verse,
+        fromDailyReading: true, // 👈 Add this flag
       });
     } catch (err) {
       console.error("Error fetching book for daily reading:", err);
@@ -63,7 +110,7 @@ const DailyReadingScreen = () => {
 
       {/* Title */}
       <Text style={styles.title}>Daily Bible Reading</Text>
-      <Text style={styles.date}>04-06-2025</Text>
+      <Text style={styles.date}>Today, {getFormattedToday()}</Text>
 
       {/* Subheading */}
       <Text style={styles.subheading}>Spend time in God’s Word today</Text>
@@ -100,19 +147,26 @@ const DailyReadingScreen = () => {
 
       <TouchableOpacity
         style={styles.buttonContainer}
-        onPress={
-          (() => navigation.navigate("DevotionScreen"), { day: todayIndex })
+        onPress={() =>
+          navigation.navigate("DevotionScreen", { day: todayIndex })
         }
       >
         <ImageBackground
           source={require("../assets/preImgDevotion.png")}
           style={styles.image}
           imageStyle={{ borderRadius: 12 }}
+          resizeMode="cover"
         >
           <View style={styles.overlay}>
-            <Text style={styles.title}>{devotion.title}</Text>
-
-            <Text style={styles.buttonText}>Check Today’s Devotion</Text>
+            <Text style={styles.ButtonText}>Check Today’s Devotion</Text>
+            <Text style={styles.title}>{todayDevotion.title}</Text>
+          </View>
+          <View style={{ padding: 10 }}>
+            <Text style={styles.sectionIntro}>
+              {formatStyledText(
+                todayDevotion.introduction.slice(0, 100) + "..."
+              )}
+            </Text>
           </View>
         </ImageBackground>
       </TouchableOpacity>
@@ -121,7 +175,7 @@ const DailyReadingScreen = () => {
         style={styles.button}
         onPress={() => navigation.goBack()}
       >
-        <Text style={styles.buttonText}>Go Back Home</Text>
+        <Text style={styles.backButtonText}>Go Back Home</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -139,20 +193,13 @@ const styles = StyleSheet.create({
     height: 200,
     marginBottom: 20,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#1f2937",
-    marginBottom: 4,
-    // alignSelf: "center",
-    padding: 16,
-    textAlign: "center",
-  },
+
   date: {
     fontSize: 14,
-    color: "#6b7280",
+    color: "#FFCCCC",
     marginBottom: 12,
     alignSelf: "flex-start",
+    fontWeight: "bold",
   },
   subheading: {
     fontSize: 16,
@@ -192,14 +239,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonText: {
+  ButtonText: {
+    color: "#FFCCCC",
+    fontSize: 16,
+    fontWeight: "bold",
+    // textAlign: "center",
+    paddingBottom: 4,
+
+    marginTop: 10,
+  },
+  backButtonText: {
     color: "#ffffff",
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "bold",
     textAlign: "center",
   },
   buttonContainer: {
-    height: 200,
+    minHeight: 200,
+    width: "100%",
     borderRadius: 12,
     overflow: "hidden",
     marginVertical: 20,
@@ -209,14 +266,16 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   overlay: {
-    backgroundColor: "rgba(0,0,0,0.1)",
+    backgroundColor: "rgba(0,0,0,0.6)",
     padding: 16,
+    flex: 1,
   },
   title: {
     fontSize: 18,
     color: "#fff",
     fontWeight: "bold",
     marginBottom: 6,
+    fontStyle: "italic",
   },
   buttonText: {
     fontSize: 14,
@@ -227,6 +286,13 @@ const styles = StyleSheet.create({
     color: "#9ca3af",
     textAlign: "center",
     marginTop: 12,
+  },
+  sectionIntro: {
+    fontSize: 15,
+    fontStyle: "italic",
+    color: "#fff",
+    lineHeight: 16,
+    fontWeight: "bold",
   },
 });
 

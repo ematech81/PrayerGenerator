@@ -3,6 +3,7 @@ import React from "react";
 import Foundation from "@expo/vector-icons/Foundation";
 import Entypo from "@expo/vector-icons/Entypo";
 import { LinearGradient } from "expo-linear-gradient";
+import { MotiView } from "moti";
 
 const DailyVerse = () => {
   return (
@@ -20,9 +21,16 @@ const DailyVerse = () => {
             <Text style={styles.textHeading}>Daily Verse</Text>
             <Text style={styles.bookText}>Philippians 4:13</Text>
           </View>
-          <Text style={styles.verseText}>
-            “I can do all things through Christ which strengtheneth me".
-          </Text>
+          {/* 🎉 Animated Verse Text */}
+          <MotiView
+            from={{ opacity: 0, translateY: 20 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ type: "timing", duration: 700 }}
+          >
+            <Text style={styles.verseText}>
+              “I can do all things through Christ which strengtheneth me".
+            </Text>
+          </MotiView>
           <View style={styles.shareContainer}>
             <Foundation name="like" size={22} color="#14314f" />
             <Entypo name="share" size={22} color="#14314f" />
@@ -65,7 +73,7 @@ const styles = StyleSheet.create({
     width: 4,
     height: "100%",
     backgroundColor: "#3edc65",
-    borderRadius: 2,
+    borderRadius: 3,
     marginRight: 12,
   },
   verseContent: {

@@ -227,11 +227,6 @@ export const fetchVerse = async (bookId, chapterId, verseId) => {
 
 export const fetchAllTranslations = async () => {
   try {
-    console.log(
-      "[DEBUG] Starting to fetch translations from:",
-      "https://bible-go-api.rkeplin.com/v1/translations"
-    );
-
     const response = await axios.get(
       "https://bible-go-api.rkeplin.com/v1/translations",
       {

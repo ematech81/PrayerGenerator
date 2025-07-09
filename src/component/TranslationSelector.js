@@ -7,6 +7,7 @@ import {
   FlatList,
   StyleSheet,
 } from "react-native";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const TranslationSelector = ({
   translations,
@@ -30,6 +31,7 @@ const TranslationSelector = ({
         <Text style={styles.selectorText}>
           {currentTranslation?.abbreviation?.toUpperCase() || "ASV"}
         </Text>
+        <AntDesign name="down" size={14} color="#ccc" />
       </TouchableOpacity>
 
       {/* Modal for selecting translation */}
@@ -78,8 +80,14 @@ const styles = StyleSheet.create({
   },
   selector: {
     padding: 8,
-    borderRadius: 6,
-    // backgroundColor: "red",
+    borderRadius: 15,
+    minWidth: 80,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.2)",
+    height: 40,
+    flexDirection: "row",
+    gap: 4,
   },
   selectorText: {
     fontSize: 16,

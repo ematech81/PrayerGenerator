@@ -52,11 +52,16 @@ const VerseScreen = () => {
 
   const route = useRoute();
   const versesListRef = useRef(null);
-  const { selectedBook, selectedChapter, verses = [] } = route.params || {};
+  const {
+    selectedBook,
+    selectedChapter,
+    verses = [],
+    fromDailyReading,
+  } = route.params || {};
 
   if (!currentTranslation || !selectedBook || !selectedChapter) return;
 
-  // Add this useEffect to load translations
+  //  useEffect to load translations
   useEffect(() => {
     const loadTranslations = async () => {
       try {
@@ -370,7 +375,9 @@ const VerseScreen = () => {
               onPress={() => navigation.goBack()}
               style={styles.headerButton}
             >
-              <Text style={styles.headerButtonText}>Ch. {selectedChapter}</Text>
+              <Text style={styles.headerButtonText}>
+                {fromDailyReading ? "Back" : `Ch. ${selectedChapter}`}
+              </Text>
             </TouchableOpacity>
 
             {/* Verse Selector */}
