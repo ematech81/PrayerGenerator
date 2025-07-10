@@ -108,6 +108,13 @@ const DailyReadingScreen = () => {
         style={[styles.headerImage, { width: width }]}
       />
 
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={styles.buttonTextBack}>Go Back Home</Text>
+      </TouchableOpacity>
+
       {/* Title */}
       <Text style={styles.title}>Daily Bible Reading</Text>
       <Text style={styles.date}>Today, {getFormattedToday()}</Text>
@@ -170,13 +177,6 @@ const DailyReadingScreen = () => {
           </View>
         </ImageBackground>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.backButtonText}>Go Back Home</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };
@@ -231,28 +231,29 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   button: {
-    backgroundColor: "#2563eb",
+    // backgroundColor: "#2563eb",
     paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 12,
     width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
   },
   ButtonText: {
     color: "#FFCCCC",
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: "bold",
-    // textAlign: "center",
+
     paddingBottom: 4,
 
     marginTop: 10,
   },
-  backButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "bold",
+  buttonTextBack: {
+    color: "#333",
+    fontSize: 11,
+    // fontWeight: "600",
     textAlign: "center",
+    fontStyle: "italic",
+    textDecoration: "underline",
   },
   buttonContainer: {
     minHeight: 200,

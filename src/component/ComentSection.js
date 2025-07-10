@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     fontSize: 16,
-    height: 100,
+    height: 70,
   },
   postButton: {
     marginLeft: 8,
@@ -140,8 +140,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   commentCard: {
-    backgroundColor: "#eee",
-    // backgroundColor: "#f9fafb",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,

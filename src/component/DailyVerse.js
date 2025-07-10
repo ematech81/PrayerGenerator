@@ -4,8 +4,25 @@ import Foundation from "@expo/vector-icons/Foundation";
 import Entypo from "@expo/vector-icons/Entypo";
 import { LinearGradient } from "expo-linear-gradient";
 import { MotiView } from "moti";
+import { dailyVerses } from "../Database/DailyVerseDatabase";
+import { getTodayDayIndex } from "../utils/dateHelper";
 
 const DailyVerse = () => {
+  const todayIndex = getTodayDayIndex();
+  const todayVerse = dailyVerses.find((v) => v.day === todayIndex);
+  console.log("daily info", todayIndex, todayVerse);
+
+  if (!todayVerse) {
+    return (
+      <View style={styles.dailyVerseContainer}>
+        <Text style={styles.textHeading}>Daily Verse</Text>
+        <Text style={styles.verseText}>
+          Today's Verse is not available yet.
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <LinearGradient
       colors={["#FFDEE9", "#B5FFFC"]}
@@ -19,18 +36,18 @@ const DailyVerse = () => {
         <View style={styles.verseContent}>
           <View style={styles.verseContainer}>
             <Text style={styles.textHeading}>Daily Verse</Text>
-            <Text style={styles.bookText}>Philippians 4:13</Text>
+            <Text style={styles.bookText}>{todayVerse.reference}</Text>
           </View>
+
           {/* 🎉 Animated Verse Text */}
           <MotiView
             from={{ opacity: 0, translateY: 20 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ type: "timing", duration: 700 }}
           >
-            <Text style={styles.verseText}>
-              “I can do all things through Christ which strengtheneth me".
-            </Text>
+            <Text style={styles.verseText}>"{todayVerse.verse}"</Text>
           </MotiView>
+
           <View style={styles.shareContainer}>
             <Foundation name="like" size={22} color="#14314f" />
             <Entypo name="share" size={22} color="#14314f" />
@@ -50,10 +67,12 @@ const styles = StyleSheet.create({
     marginTop: 10,
     padding: 10,
     elevation: 3,
+    minHeight: 200,
   },
   innerContainer: {
     flexDirection: "row",
     alignItems: "center",
+    minHeight: 200,
   },
   verseContainer: {
     flexDirection: "row",
@@ -71,10 +90,11 @@ const styles = StyleSheet.create({
   },
   verseDesign: {
     width: 4,
-    height: "100%",
+    minHeight: 200,
     backgroundColor: "#3edc65",
     borderRadius: 3,
     marginRight: 12,
+    marginVertical: "auto",
   },
   verseContent: {
     flex: 1,
