@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  Image,
 } from "react-native";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 
 const dummyComments = [
   {
@@ -78,7 +80,12 @@ const CommentSection = () => {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.commentCard}>
-            <Text style={styles.username}>{item.username}</Text>
+            <View style={styles.commentUserWrapper}>
+              <View style={styles.iconContainer}>
+                <FontAwesome5 name="user" size={24} color="black" />
+              </View>
+              <Text style={styles.username}>{item.username}</Text>
+            </View>
             <Text style={styles.commentText}>{item.text}</Text>
 
             <View style={styles.commentActions}>
@@ -93,7 +100,12 @@ const CommentSection = () => {
             {/* Replies */}
             {item.replies.map((reply) => (
               <View key={reply.id} style={styles.replyCard}>
-                <Text style={styles.username}>{reply.username}</Text>
+                <View style={styles.commentUserWrapper}>
+                  <View>
+                    <FontAwesome5 name="user" size={24} color="black" />
+                    <Text style={styles.username}>{reply.username}</Text>
+                  </View>
+                </View>
                 <Text style={styles.commentText}>{reply.text}</Text>
               </View>
             ))}
@@ -170,6 +182,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#eef2ff",
     padding: 8,
     borderRadius: 8,
+  },
+  commentUserWrapper: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    gap: 2,
+  },
+  iconContainer: {
+    borderWidth: 2,
+    padding: 2,
+    backgroundColor: "#ccc",
   },
 });
 

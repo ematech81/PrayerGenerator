@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useRef, useState } from "react";
 import axios from "axios";
 
 export const BibleContext = createContext();
@@ -36,6 +36,8 @@ export const BibleProvider = ({ children }) => {
   //     setPlayerStatus((prev) => (prev === "playing" ? "paused" : "playing"));
   //   }
   // };
+
+  const audioObjRef = useRef(null);
 
   const toggleAudioMode = (value) => {
     if (value !== undefined) {
@@ -86,8 +88,8 @@ export const BibleProvider = ({ children }) => {
         setSelectedVideo,
         showPlayerOptions,
         selectVideo,
-        currentVideoId,
         isPlaying,
+        setIsPlaying,
         isAudioMode,
         playerStatus,
         playVideo,
@@ -100,6 +102,9 @@ export const BibleProvider = ({ children }) => {
         playAsVideo,
         closeAudioModal,
         closeVideoModal,
+        audioObjRef,
+        currentVideoId,
+        setCurrentVideoId,
       }}
     >
       {children}
