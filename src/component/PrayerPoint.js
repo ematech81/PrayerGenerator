@@ -93,6 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     padding: 16,
     borderRadius: 8,
+    // height: 100,
   },
   textInstruction: {
     color: "#14314f",

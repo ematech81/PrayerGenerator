@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
 
   date: {
     fontSize: 14,
-    color: "#FFCCCC",
+    color: "#ccc",
     marginBottom: 12,
     alignSelf: "flex-start",
     fontWeight: "bold",

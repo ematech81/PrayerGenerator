@@ -225,9 +225,9 @@ const VerseScreen = () => {
           <Text style={styles.verseText}>{verseText}</Text>
 
           {/* Show spinner while loading translation */}
-          {isLoadingTranslation && verseNumber === 1 && (
+          {/* {isLoadingTranslation && verseNumber === 1 && (
             <ActivityIndicator size="small" style={styles.loadingIndicator} />
-          )}
+          )} */}
         </TouchableOpacity>
 
         {/* Action box: Explain with Bible Teacher */}
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   selectedVerse: {
-    backgroundColor: "#eee",
+    backgroundColor: "#ffcccc",
     // backgroundColor: "#f0f4ff",
     borderLeftWidth: 3,
     borderLeftColor: "#4263eb",

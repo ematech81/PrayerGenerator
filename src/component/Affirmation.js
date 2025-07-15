@@ -1,7 +1,16 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
+import { useNavigation } from "@react-navigation/native";
+import { Navigation } from "lucide-react-native";
 
 const Affirmation = () => {
+  const navigation = useNavigation();
   return (
     <View style={styles.prayerContainer}>
       <View style={styles.containerWrapper}>
@@ -21,14 +30,19 @@ const Affirmation = () => {
         </View>
 
         <View style={{}}>
-          <Text style={{ color: "#000", fontSize: 11, paddingRight: 10 }}>
-            See all
-          </Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("AffirmationScreen")}
+            style={{ padding: 10 }}
+          >
+            <Text style={{ color: "#000", fontSize: 14, paddingRight: 10 }}>
+              See all
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
 
       <Text style={styles.textInstruction}>
-        Select any topic to generate prayer Points
+        Start your day with refreshing words
       </Text>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>

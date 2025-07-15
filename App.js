@@ -4,6 +4,7 @@ import BottomTabs from "./src/navigation/BottomTabs";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import PrayerPointScreen from "./src/screens/PrayerPointScreen";
+import AffirmationScreen from "./src/screens/AffirmationScreen";
 import GeneratedScreen from "./src/screens/GeneratedScreen";
 import { BibleProvider } from "./src/contex/BibleContext";
 import AIScreen from "./src/screens/AIScreen";
@@ -42,6 +43,10 @@ export default function App() {
             <Stack.Screen
               name="PrayerPointScreen"
               component={PrayerPointScreen}
+            />
+            <Stack.Screen
+              name="AffirmationScreen"
+              component={AffirmationScreen}
             />
             <Stack.Screen name="GeneratedScreen" component={GeneratedScreen} />
             <Stack.Screen

@@ -93,6 +93,9 @@ const PrayerScreen = () => {
     "#1565c0",
     "#4527a0",
     "#004d40",
+    "#03c988",
+    "#3dc1ee",
+    // "#ee6a3d",
   ];
 
   const navigation = useNavigation();
@@ -131,7 +134,9 @@ const PrayerScreen = () => {
       >
         {categories.map(renderCategoryItem)}
       </ScrollView>
-
+      <Text style={{ paddingLeft: 10, marginBottom: 10, fontWeight: 600 }}>
+        Search By Topics
+      </Text>
       <FlatList
         data={topics}
         keyExtractor={(item) => item._id}
@@ -193,7 +198,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 12,
     color: "#000000",
@@ -224,7 +229,7 @@ const styles = StyleSheet.create({
     // backgroundColor: "red",
   },
   categSubHeadingText: {
-    fontSize: 22,
+    fontSize: 20,
     lineHeight: 30,
     fontWeight: "bold",
     color: "#1e2572",

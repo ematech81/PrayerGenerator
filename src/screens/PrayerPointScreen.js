@@ -181,6 +181,8 @@ const PrayerScreen = () => {
         {categories.map(renderCategoryItem)}
       </ScrollView>
 
+      {/* <View></View> */}
+
       <FlatList
         data={topics}
         keyExtractor={(item) => item._id}

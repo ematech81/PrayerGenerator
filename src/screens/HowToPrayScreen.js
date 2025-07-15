@@ -76,17 +76,19 @@ const HowToPrayScreen = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.closeButton}
+        onPress={() => navigation.goBack()}
+      >
+        <Text style={{ color: "#ff008c", fontSize: 16 }}>Close</Text>
+      </TouchableOpacity>
       <Image
         source={prayerImage}
         resizeMode="cover"
         style={[styles.headerImage, { width: width }]}
       />
-      <TouchableOpacity
-        style={styles.closeButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={{ color: "#f0f0f0", fontSize: 16 }}>Close</Text>
-      </TouchableOpacity>
+
+      <Text style={styles.guidedPrayer}>Guided Prayer</Text>
       <MotiView
         key={currentStep}
         from={{ opacity: 0, translateY: 20 }}
@@ -145,12 +147,14 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   closeButton: {
-    position: "absolute",
-    top: 50,
-    left: 20,
     backgroundColor: "#333",
     padding: 10,
     borderRadius: 20,
+    width: 80,
+    marginBottom: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 16,
   },
   card: {
     // backgroundColor: "#f9f9f9",
@@ -162,6 +166,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     color: "#ccc",
+    textAlign: "center",
+    fontStyle: "underline",
+  },
+  guidedPrayer: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#3dc1ee",
     textAlign: "center",
     fontStyle: "underline",
   },

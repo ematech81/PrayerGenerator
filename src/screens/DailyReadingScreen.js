@@ -166,14 +166,15 @@ const DailyReadingScreen = () => {
         >
           <View style={styles.overlay}>
             <Text style={styles.ButtonText}>Check Today’s Devotion</Text>
-            <Text style={styles.title}>{todayDevotion.title}</Text>
-          </View>
-          <View style={{ padding: 10 }}>
-            <Text style={styles.sectionIntro}>
-              {formatStyledText(
-                todayDevotion.introduction.slice(0, 100) + "..."
-              )}
-            </Text>
+            <Text style={styles.title}>{todayDevotion?.title}</Text>
+
+            <View style={{ padding: 10 }}>
+              <Text style={styles.sectionIntro}>
+                {formatStyledText(
+                  todayDevotion?.introduction.slice(0, 100) + "..."
+                )}
+              </Text>
+            </View>
           </View>
         </ImageBackground>
       </TouchableOpacity>
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
 
   date: {
     fontSize: 14,
-    color: "#FFCCCC",
+    color: "#ccc",
     marginBottom: 12,
     alignSelf: "flex-start",
     fontWeight: "bold",
@@ -256,7 +257,6 @@ const styles = StyleSheet.create({
     textDecoration: "underline",
   },
   buttonContainer: {
-    minHeight: 200,
     width: "100%",
     borderRadius: 12,
     overflow: "hidden",
@@ -267,12 +267,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
   },
   overlay: {
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "rgba(0,0,0,0.3)",
     padding: 16,
     flex: 1,
+    minHeight: 250,
   },
   title: {
-    fontSize: 18,
+    fontSize: 20,
     color: "#fff",
     fontWeight: "bold",
     marginBottom: 6,
@@ -289,10 +290,10 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   sectionIntro: {
-    fontSize: 15,
+    fontSize: 16,
     fontStyle: "italic",
     color: "#fff",
-    lineHeight: 16,
+    lineHeight: 22,
     fontWeight: "bold",
   },
 });
