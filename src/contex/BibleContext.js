@@ -1,8 +1,25 @@
-import React, { createContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import axios from "axios";
 import * as SecureStore from "expo-secure-store";
+import DummyPrayer from "../constant/DummyPrayer";
 
 export const BibleContext = createContext();
+
+export const useBible = () => {
+  const ctx = useContext(BibleContext);
+  if (!ctx) {
+    throw new Error("useBible must be used within BibleProvider");
+  }
+  return ctx;
+};
 
 export const BibleProvider = ({ children }) => {
   // Player state
@@ -101,6 +118,55 @@ export const BibleProvider = ({ children }) => {
     // Your existing implementation
   };
 
+  // prayer point logic
+  /* 1. full topic list straight from the JSON */
+  const topics = useMemo(() => DummyPrayer, []);
+
+  /* 2. deterministic “daily four” */
+  const getDailyTopics = useCallback(
+    (count = 4) => {
+      const today = new Date().toISOString().slice(0, 10); // e.g. "2025-07-16"
+
+      // hash today’s date into a number
+      let hash = 0;
+      for (let i = 0; i < today.length; i++) {
+        hash = today.charCodeAt(i) + ((hash << 5) - hash);
+      }
+
+      // tiny PRNG (mulberry32)
+      const rand = (seed) => {
+        return () => {
+          seed |= 0;
+          seed = (seed + 0x6d2b79f5) | 0;
+          let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+          return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+      };
+      const random = rand(hash);
+
+      // shuffle copy of the list
+      const shuffled = [...topics];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled.slice(0, count);
+    },
+    [topics]
+  );
+
+  /* 3. helpers */
+  const getTopicById = useCallback(
+    (id) => topics.find((t) => t._id === id),
+    [topics]
+  );
+
+  const getPrayersByTopicId = useCallback(
+    (id) => (getTopicById(id) || {}).prayers || [],
+    [getTopicById]
+  );
+
   return (
     <BibleContext.Provider
       value={{
@@ -141,6 +207,10 @@ export const BibleProvider = ({ children }) => {
         setQueueIndex,
         playQueue,
         setPlayQueue,
+        topics,
+        getDailyTopics,
+        getTopicById,
+        getPrayersByTopicId,
       }}
     >
       {children}

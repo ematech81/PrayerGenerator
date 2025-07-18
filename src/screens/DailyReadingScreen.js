@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 24,
     paddingBottom: 40,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#9f9171ff",
     alignItems: "center",
   },
   headerImage: {

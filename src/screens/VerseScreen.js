@@ -12,6 +12,8 @@ import {
   Alert,
   Image,
   SafeAreaView,
+  ImageBackground,
+  Platform,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import TranslationVerse from "../component/TranslationVerse";
@@ -200,7 +202,7 @@ const VerseScreen = () => {
         style={[
           styles.verseContainer,
           isSelected && styles.selectedVerse,
-          isActive && { backgroundColor: "#DFF8E8" },
+          // isActive && { backgroundColor: "#DFF8E8" },
         ]}
       >
         {/* Main verse display */}
@@ -217,12 +219,16 @@ const VerseScreen = () => {
                     : "dots-three-horizontal"
                 }
                 size={20}
-                color="blue"
+                color="#ccc"
               />
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.verseText}>{verseText}</Text>
+          <Text
+            style={[styles.verseText, isSelected && styles.selectedVerseText]}
+          >
+            {verseText}
+          </Text>
 
           {/* Show spinner while loading translation */}
           {/* {isLoadingTranslation && verseNumber === 1 && (
@@ -362,213 +368,229 @@ const VerseScreen = () => {
   // main return component
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={styles.versesContainer}>
-        <View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalHeader}
-          >
-            {/* Chapter Selector */}
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.headerButton}
+    <ImageBackground
+      source={require("../assets/verseHeader.jpg")}
+      resizeMode="cover"
+      style={{
+        flex: 1,
+        paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+      }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.versesContainer}>
+          <View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.horizontalHeader}
             >
-              <Text style={styles.headerButtonText}>
-                {fromDailyReading ? "Back" : `Ch. ${selectedChapter}`}
-              </Text>
-            </TouchableOpacity>
+              {/* Chapter Selector */}
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={styles.headerButton}
+              >
+                <Text style={styles.headerButtonText}>
+                  {fromDailyReading ? "Back" : `Ch. ${selectedChapter}`}
+                </Text>
+              </TouchableOpacity>
 
-            {/* Verse Selector */}
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => setShowVerseSelector(!showVerseSelector)}
-            >
-              <Text style={styles.headerButtonText}>
-                {showVerseSelector ? "Hide Verses" : "Show Verses"}
-              </Text>
-            </TouchableOpacity>
+              {/* Verse Selector */}
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => setShowVerseSelector(!showVerseSelector)}
+              >
+                <Text style={styles.headerButtonText}>
+                  {showVerseSelector ? "Hide Verses" : "Show Verses"}
+                </Text>
+              </TouchableOpacity>
 
-            {/* Translation Dropdown Selector */}
-            <TranslationSelector
-              translations={translations}
-              currentTranslation={currentTranslation}
-              onSelectTranslation={(selected) => {
-                setCurrentTranslation(selected);
-              }}
-            />
-
-            {/* Audio Bible Button */}
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={toggleSpeech} // ✅ Moved this out of text content
-            >
-              <Ionicons name="volume-medium" size={20} color="white" />
-            </TouchableOpacity>
-
-            {/* AI Teacher Assistant */}
-            <TouchableOpacity
-              style={styles.headerButton}
-              onPress={() => console.log("AI Assistance")}
-            >
-              <Image
-                source={AiIcon}
-                resizeMode="cover"
-                style={{
-                  width: 30,
-                  height: 30,
-                  borderRadius: 25,
-                  borderWidth: 2,
-                  borderColor: "#ccc",
+              {/* Translation Dropdown Selector */}
+              <TranslationSelector
+                translations={translations}
+                currentTranslation={currentTranslation}
+                onSelectTranslation={(selected) => {
+                  setCurrentTranslation(selected);
                 }}
               />
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
 
-        {/* book name component */}
+              {/* Audio Bible Button */}
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={toggleSpeech} // ✅ Moved this out of text content
+              >
+                <Ionicons name="volume-medium" size={20} color="white" />
+              </TouchableOpacity>
 
-        <View style={styles.bookChapterTitle}>
-          {/* Previous Chapter */}
-          <TouchableOpacity
-            onPress={() => {
-              if (selectedChapter > 1) {
-                navigation.replace("VerseScreen", {
-                  selectedBook,
-                  selectedChapter: selectedChapter - 1,
-                });
-              }
-            }}
-            disabled={selectedChapter <= 1}
-            style={{ padding: 4 }}
-          >
-            <AntDesign
-              name="arrowleft"
-              size={24}
-              color={selectedChapter > 1 ? "blue" : "gray"}
-            />
-          </TouchableOpacity>
+              {/* AI Teacher Assistant */}
+              <TouchableOpacity
+                style={styles.headerButton}
+                onPress={() => console.log("AI Assistance")}
+              >
+                <Image
+                  source={AiIcon}
+                  resizeMode="cover"
+                  style={{
+                    width: 30,
+                    height: 30,
+                    borderRadius: 25,
+                    borderWidth: 2,
+                    borderColor: "#ccc",
+                  }}
+                />
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
 
-          {/* Book Title - Back to Book List */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate("MainTabs", { screen: "Bible" })}
-            style={styles.headerButton}
-          >
-            <Text style={styles.verseHeaderTitle}>
-              {selectedBook?.name} {selectedChapter}
-            </Text>
-          </TouchableOpacity>
+          {/* book name component */}
 
-          {/* Next Chapter */}
-          <TouchableOpacity
-            onPress={() => {
-              const maxChapter = selectedBook?.chapterCount || 150; // Fallback if chapterCount is undefined
-              if (selectedChapter < maxChapter) {
-                navigation.replace("VerseScreen", {
-                  selectedBook,
-                  selectedChapter: selectedChapter + 1,
-                });
-              }
-            }}
-            disabled={selectedChapter >= selectedBook?.chapterCount}
-            style={{ padding: 4 }}
-          >
-            <AntDesign
-              name="arrowright"
-              size={24}
-              color={
-                selectedChapter < (selectedBook?.chapterCount || 150)
-                  ? "blue"
-                  : "gray"
-              }
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Verse Selector Grid */}
-        {showVerseSelector && (
-          <VerseSelector
-            verses={translationVerses.length > 0 ? translationVerses : verses}
-            onSelectVerse={(verseId) => {
-              const data =
-                translationVerses.length > 0 ? translationVerses : verses;
-
-              const verseIndex = data.findIndex(
-                (v) => v.verseId === verseId || v.id === verseId
-              );
-
-              // Step 1: highlight selected verse
-              setSelectedVerseId(verseId);
-
-              // Step 2: close the selector
-              setShowVerseSelector(false);
-
-              // Step 3: scroll to selected verse AFTER closing UI
-              setTimeout(() => {
-                if (versesListRef.current && verseIndex >= 0) {
-                  versesListRef.current.scrollToIndex({
-                    index: verseIndex,
-                    animated: true,
-                    viewPosition: 0, // 0 = top, 0.5 = center, 1 = bottom
+          <View style={styles.bookChapterTitle}>
+            {/* Previous Chapter */}
+            <TouchableOpacity
+              onPress={() => {
+                if (selectedChapter > 1) {
+                  navigation.replace("VerseScreen", {
+                    selectedBook,
+                    selectedChapter: selectedChapter - 1,
                   });
                 }
-              }, 500); // Delay helps layout stabilize
-            }}
-            onClose={() => setShowVerseSelector(false)}
-          />
-        )}
+              }}
+              disabled={selectedChapter <= 1}
+              style={{ padding: 4 }}
+            >
+              <AntDesign
+                name="arrowleft"
+                size={24}
+                color={selectedChapter > 1 ? "#fff" : "gray"}
+              />
+            </TouchableOpacity>
 
-        {/* Verses List */}
-        <FlatList
-          ref={versesListRef}
-          data={translationVerses.length > 0 ? translationVerses : verses}
-          extraData={currentTranslation.abbreviation}
-          renderItem={renderVerseItem}
-          keyExtractor={(item) =>
-            currentTranslation
-              ? `verse-${currentTranslation.abbreviation}-${item.id}`
-              : `verse-unknown-${item.id}`
-          }
-          getItemLayout={(data, index) => ({
-            length: 190,
-            offset: 190 * index,
-            index,
-          })}
-          onScrollToIndexFailed={({ index, averageItemLength }) => {
-            setTimeout(() => {
-              versesListRef.current?.scrollToOffset(
-                {
-                  offset: index * averageItemLength,
-                  animated: true,
-                },
-                500
-              );
-            });
-          }}
-          contentContainerStyle={styles.versesList}
-        />
-
-        <View style={styles.aiAbsoluteContainer}>
-          {/* AI BUTTON */}
-          <TouchableOpacity
-            style={styles.floatingAiButton}
-            onPress={() => {
-              if (!selectedVerseItem) {
-                Alert.alert("Bible Teacher", "Please select a verse first.");
-              } else {
-                navigation.navigate("AIScreen", {
-                  verse: selectedVerseItem,
-                  reference: `${selectedBook?.name} ${selectedChapter}:${selectedVerseItem.verseId}`,
-                });
+            {/* Book Title - Back to Book List */}
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("MainTabs", { screen: "Bible" })
               }
+              style={styles.chapterNameCont}
+            >
+              <Text style={styles.verseHeaderTitle}>
+                {selectedBook?.name} {selectedChapter}
+              </Text>
+            </TouchableOpacity>
+
+            {/* Next Chapter */}
+            <TouchableOpacity
+              onPress={() => {
+                const maxChapter = selectedBook?.chapterCount || 150; // Fallback if chapterCount is undefined
+                if (selectedChapter < maxChapter) {
+                  navigation.replace("VerseScreen", {
+                    selectedBook,
+                    selectedChapter: selectedChapter + 1,
+                  });
+                }
+              }}
+              disabled={selectedChapter >= selectedBook?.chapterCount}
+              style={{ padding: 4 }}
+            >
+              <AntDesign
+                name="arrowright"
+                size={24}
+                color={
+                  selectedChapter < (selectedBook?.chapterCount || 150)
+                    ? "#fff"
+                    : "gray"
+                }
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Verse Selector Grid */}
+          {showVerseSelector && (
+            <VerseSelector
+              verses={translationVerses.length > 0 ? translationVerses : verses}
+              onSelectVerse={(verseId) => {
+                const data =
+                  translationVerses.length > 0 ? translationVerses : verses;
+
+                const verseIndex = data.findIndex(
+                  (v) => v.verseId === verseId || v.id === verseId
+                );
+
+                // Step 1: highlight selected verse
+                setSelectedVerseId(verseId);
+
+                // Step 2: close the selector
+                setShowVerseSelector(false);
+
+                // Step 3: scroll to selected verse AFTER closing UI
+                setTimeout(() => {
+                  if (versesListRef.current && verseIndex >= 0) {
+                    versesListRef.current.scrollToIndex({
+                      index: verseIndex,
+                      animated: true,
+                      viewPosition: 0, // 0 = top, 0.5 = center, 1 = bottom
+                    });
+                  }
+                }, 500); // Delay helps layout stabilize
+              }}
+              onClose={() => setShowVerseSelector(false)}
+            />
+          )}
+
+          {/* Verses List */}
+          <FlatList
+            ref={versesListRef}
+            data={translationVerses.length > 0 ? translationVerses : verses}
+            extraData={currentTranslation.abbreviation}
+            renderItem={renderVerseItem}
+            keyExtractor={(item) =>
+              currentTranslation
+                ? `verse-${currentTranslation.abbreviation}-${item.id}`
+                : `verse-unknown-${item.id}`
+            }
+            getItemLayout={(data, index) => ({
+              length: 190,
+              offset: 190 * index,
+              index,
+            })}
+            onScrollToIndexFailed={({ index, averageItemLength }) => {
+              setTimeout(() => {
+                versesListRef.current?.scrollToOffset(
+                  {
+                    offset: index * averageItemLength,
+                    animated: true,
+                  },
+                  500
+                );
+              });
             }}
-          >
-            <Image source={AiIcon} resizeMode="cover" style={styles.AiIcon} />
-          </TouchableOpacity>
+            contentContainerStyle={styles.versesList}
+          />
+
+          <View style={styles.aiAbsoluteContainer}>
+            {/* AI BUTTON */}
+            <TouchableOpacity
+              style={styles.floatingAiButton}
+              onPress={() => {
+                if (!selectedVerseItem) {
+                  Alert.alert("Bible Teacher", "Please select a verse first.");
+                } else {
+                  navigation.navigate("AIScreen", {
+                    verse: selectedVerseItem,
+                    reference: `${selectedBook?.name} ${selectedChapter}:${selectedVerseItem.verseId}`,
+                  });
+                }
+              }}
+            >
+              <Image source={AiIcon} resizeMode="cover" style={styles.AiIcon} />
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+      <StatusBar
+        backgroundColor="transparent"
+        barStyle="light-content"
+        translucent
+      />
+    </ImageBackground>
   );
 };
 
@@ -576,7 +598,7 @@ const styles = StyleSheet.create({
   versesContainer: {
     flex: 1,
     // backgroundColor: "red",
-    backgroundColor: "#fff",
+    // backgroundColor: "#fff",
     marginTop: 26,
     position: "relative",
   },
@@ -588,12 +610,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     // backgroundColor: "#000",
   },
-  verseHeaderTitle: {
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    fontStyle: "underline",
-  },
+
   versesList: {
     padding: 16,
   },
@@ -601,17 +618,18 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     marginTop: 10,
     // paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    paddingHorizontal: 10,
+    // borderBottomWidth: 1,
+    // borderBottomColor: "#eee",
+    paddingHorizontal: 2,
     minHeight: 100,
     flexWrap: "wrap",
     overflow: "hidden",
   },
   verseNumber: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#4263eb",
+    color: "#f3f307ff",
+    // color: "#4263eb",
     marginRight: 8,
     lineHeight: 22,
   },
@@ -619,16 +637,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     lineHeight: 25,
     flex: 1,
-    color: "#333",
+    color: "#fff",
     textAlign: "justify",
     fontWeight: "400",
-    fontStyle: "italic",
+    // fontStyle: "italic",
   },
   verseChapterWrapper: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: 3,
+    padding: 1,
     // backgroundColor: "#f8f",
   },
 
@@ -697,10 +715,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   selectedVerse: {
+    borderLeftWidth: 1,
+    borderLeftColor: "#fff",
+    // borderLeftColor: "#4263eb",
+  },
+  selectedVerseText: {
     backgroundColor: "#ffcccc",
-    // backgroundColor: "#f0f4ff",
-    borderLeftWidth: 3,
-    borderLeftColor: "#4263eb",
   },
   closeButton: {
     marginTop: 20,
@@ -733,6 +753,17 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: "center",
   },
+  chapterCount: {
+    paddingVertical: 0,
+    paddingHorizontal: 16,
+    borderRadius: 15,
+    // backgroundColor: "rgba(255,255,255,0.2)",
+    // marginRight: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    height: 40,
+    justifyContent: "center",
+  },
   headerButtonText: {
     color: "white",
     fontSize: 16,
@@ -741,17 +772,18 @@ const styles = StyleSheet.create({
   bookChapterTitle: {
     // padding: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#333",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 10,
     flexDirection: "row",
     gap: 20,
+    paddingBottom: 10,
   },
   verseHeaderTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: "#333",
+    color: "#fff",
     textAlign: "center",
     fontStyle: "italic",
     marginRight: 15,
@@ -810,6 +842,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: "red",
     padding: 4,
+    borderRadius: 50,
   },
 });
 

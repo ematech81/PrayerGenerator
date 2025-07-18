@@ -1,135 +1,99 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import React, { use } from "react";
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useBible } from "../contex/BibleContext";
+
+const palette = [
+  { backgroundColor: "#b3e5fc" },
+  { backgroundColor: "#c8e6c9" },
+  { backgroundColor: "#fff9c4" },
+  { backgroundColor: "#ffe0b2" },
+];
 
 const PrayerPoint = () => {
-  const Navigation = useNavigation();
+  const navigation = useNavigation();
+  const { getDailyTopics } = useBible();
+  const [topics, setTopics] = useState([]);
+
+  useEffect(() => {
+    setTopics(getDailyTopics());
+  }, [getDailyTopics]);
+
+  const openPrayerScreen = (id, name) => {
+    navigation.navigate("Prayer", { topicId: id, topicName: name });
+  };
 
   return (
     <View style={styles.prayerContainer}>
+      {/* heading */}
       <View style={styles.containerWrapper}>
         <View style={styles.prayerPointContainer}>
-          {/* <View> */}
-          <View
-            style={{
-              width: 10,
-              height: 10,
-              backgroundColor: "#3edc65",
-              borderRadius: 2,
-              marginRight: 6,
-              borderRadius: 100,
-            }}
-          ></View>
+          <View style={styles.bullet} />
           <Text style={styles.prayerPointHeading}>Prayer Point</Text>
         </View>
 
-        <View style={{}}>
-          <Pressable onPress={() => Navigation.navigate("Prayer")}>
-            <Text style={{ color: "#333", fontSize: 14, paddingRight: 10 }}>
-              See all
-            </Text>
-          </Pressable>
-        </View>
+        <Pressable onPress={() => navigation.navigate("PrayerGenerator")}>
+          <Text style={styles.seeAll}>See all</Text>
+        </Pressable>
       </View>
 
       <Text style={styles.textInstruction}>
-        Select any topic to generate prayer Points
+        Select any topic to generate Prayer Points
       </Text>
 
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
+      >
         <View style={styles.row}>
-          <View style={[styles.box, styles.box1]}>
-            <Text style={styles.text}>Healing</Text>
-          </View>
-          <View style={[styles.box, styles.box2]}>
-            <Text style={styles.text}>Depression</Text>
-          </View>
-          <View style={[styles.box, styles.box3]}>
-            <Text style={styles.text}>Fear</Text>
-          </View>
-          <View style={[styles.box, styles.box4]}>
-            <Text style={styles.text}>Peace</Text>
-          </View>
-          {/* Add more boxes as needed */}
+          {topics.map((t, i) => (
+            <Pressable
+              key={t._id}
+              onPress={() => openPrayerScreen(t._id, t.topic)}
+            >
+              <View style={[styles.box, palette[i % palette.length]]}>
+                <Text style={styles.text}>{t.topic}</Text>
+              </View>
+            </Pressable>
+          ))}
         </View>
       </ScrollView>
     </View>
   );
 };
 
-export default PrayerPoint;
-
 const styles = StyleSheet.create({
-  prayerContainer: {
-    borderRadius: 10,
-    marginTop: 10,
-    padding: 10,
-    backgroundColor: "#ddd",
-    // backgroundColor: "#321033",
-    // backgroundColor: "#dbea",
-    width: "96%",
-    // shadowColor: "#000",
-    marginHorizontal: "auto",
-    elevation: 3,
-  },
-
-  prayerPointHeading: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#000",
-    marginBottom: 6,
-  },
-  scrollContainer: {
-    padding: 10,
-  },
-  row: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
-  },
-  box: {
-    width: "48%",
-    //     backgroundColor: "#14314f",
-    marginBottom: 10,
-    padding: 16,
-    borderRadius: 8,
-    // height: 100,
-  },
-  textInstruction: {
-    color: "#14314f",
-    fontSize: 14,
-    fontWeight: "bold",
-    marginLeft: 10,
-    lineHeight: 22,
-  },
-
-  text: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
-  },
-  box1: {
-    backgroundColor: "#992c55",
-  },
-  box2: {
-    backgroundColor: "#45374e",
-  },
-  box3: {
-    backgroundColor: "#f19727",
-  },
-  box4: {
-    backgroundColor: "#3d79c2",
-  },
+  prayerContainer: { marginBottom: 24, padding: 16 },
   containerWrapper: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
   },
-  prayerPointContainer: {
-    flexDirection: "row",
+  prayerPointContainer: { flexDirection: "row", alignItems: "center" },
+  bullet: {
+    width: 10,
+    height: 10,
+    backgroundColor: "#3edc65",
+    borderRadius: 100,
+    marginRight: 6,
+  },
+  prayerPointHeading: { fontSize: 18, fontWeight: "700", color: "#fff" },
+  seeAll: { color: "#ccc", fontSize: 14, paddingRight: 10 },
+  textInstruction: { marginVertical: 8, color: "#fff" },
+  scrollContainer: { paddingVertical: 4 },
+  row: { flexDirection: "row", gap: 8 },
+  box: {
+    Width: "45%",
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginBottom: 8,
     alignItems: "center",
-    justifyContent: "flex-start",
+    minHeight: 150,
+    flexDirection: "row",
   },
+  text: { fontSize: 14, fontWeight: "600" },
 });
+
+export default PrayerPoint;

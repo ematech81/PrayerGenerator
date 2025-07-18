@@ -1,3 +1,8 @@
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+
 import { StatusBar } from "expo-status-bar";
 // import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import BottomTabs from "./src/navigation/BottomTabs";
@@ -13,13 +18,15 @@ import DailyReadingScreen from "./src/screens/DailyReadingScreen";
 import DevotionScreen from "./src/screens/DevotionScreen";
 import AudioPlayerScreen from "./src/screens/AudioPlayerScreen";
 import { initializeDatabase } from "./src/Database/SqlHelper";
-import { useEffect } from "react";
 import { syncTranslationsToSQLite } from "./src/SQLDatabaseFill";
 import { Platform } from "react-native";
 import { fetchVersesFromApiBible } from "./src/utils/apiService";
 import VerseScreen from "./src/screens/VerseScreen";
 import ChaptersScreen from "./src/screens/ChaptersScreen";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import ChildrenLandingScreen from "./src/screens/ChildrenLandingScreen";
+import AIAssistanceScreen from "./src/screens/AIAssistanceScreen";
+
 
 const Stack = createNativeStackNavigator();
 
@@ -31,6 +38,24 @@ export default function App() {
 
     fetchTestVerses();
   }, []);
+
+  // const [fontsLoaded] = Font.useFonts({
+  //   "Nunito-Regular": require("./src/assets/fonts/Nunito-Regular.ttf"),
+  //   "Nunito-Bold": require("./src/assets/fonts/Nunito-Bold.ttf"),
+  //   "Roboto-Regular": require("./src/assets/fonts/Roboto-Regular.ttf"),
+  //   "Roboto-Bold": require("./src/assets/fonts/Roboto-Bold.ttf"),
+  // });
+
+  // useEffect(() => {
+  //   async function prepare() {
+  //     if (fontsLoaded) {
+  //       await SplashScreen.hideAsync();
+  //     }
+  //   }
+  //   prepare();
+  // }, [fontsLoaded]);
+
+  // if (!fontsLoaded) return null;
 
   return (
     <BibleProvider>
@@ -75,7 +100,19 @@ export default function App() {
               options={{ title: "Audio Player" }}
             />
             <Stack.Screen name="ChaptersScreen" component={ChaptersScreen} />
+            <Stack.Screen
+              name="ChildrenLandingScreen"
+              component={ChildrenLandingScreen}
+            />
             <Stack.Screen name="VerseScreen" component={VerseScreen} />
+            <Stack.Screen
+              name="AIAssistanceScreen"
+              component={AIAssistanceScreen}
+            />
+            <Stack.Screen
+              name="KidBibleStoriesScreen"
+              component={KidBibleStoriesScreen}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </SafeAreaProvider>

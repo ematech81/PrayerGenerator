@@ -66,7 +66,7 @@ export default function BottomTabs() {
 
         // 🎨 Style the tab bar
         tabBarStyle: {
-          backgroundColor: "#fff", // Change to your desired background color
+          backgroundColor: "#1e2572", // Change to your desired background color
           // borderTopLeftRadius: 20,
           // borderTopRightRadius: 20,
           height: 50,

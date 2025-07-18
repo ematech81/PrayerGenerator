@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#374151",
     lineHeight: 24,
+    textAlign: "justify",
   },
   sectionHeading: {
     fontSize: 18,
@@ -248,6 +249,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#374151",
     lineHeight: 28,
+    textAlign: "justify",
   },
   bulletPoint: {
     fontSize: 16,
